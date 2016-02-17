@@ -1,6 +1,7 @@
 #!/bin/sh
 # get battery status in ±percentage depending on whether it's charging or not
 
+# platform specific
 dir=/sys/class/power_supply/BAT0
 
 # check charging status
