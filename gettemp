@@ -1,6 +1,5 @@
 #!/bin/sh
 # get CPU temperature in celsius
 
-# /proc/acpi/ibm is platform specific (ThinkPad)
-grep --color=never --only-matching --max-count=1 \
-   --extended-regexp '[0-9]{2}' /proc/acpi/ibm/thermal
+# platform specific
+awk '{ print $2 }' /proc/acpi/ibm/thermal
