@@ -7,4 +7,5 @@ sed --regexp-extended "s/( |,|;|<|>|\(|\)|│|'|\")/\n/g" \
 		'(git|https?|s?ftp|rsync|ssh)://' \
 	| sort --ignore-case --unique \
 	| dmenu -f -i -l 10 \
+	| tr --delete '\n' \
 	| xsel --input
