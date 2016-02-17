@@ -1,0 +1,14 @@
+#!/bin/sh
+# set dwm's status
+
+while (true)
+do
+        xsetroot -name "$(printf 'E: %s  W: %s  %d°C  %d%%  %s' \
+                "$(geteth)" \
+                "$(getwifi)" \
+                "$(gettemp)" \
+                "$(getvol)" \
+                "$(date '+%a %d.%m.%y %H:%M')" \
+        )"
+	sleep 30
+done
