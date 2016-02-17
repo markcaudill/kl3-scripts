@@ -1,12 +1,8 @@
 #!/bin/sh
-# get ALSA master volume in percentage and 'muted' if muted
-# (assumes that left and right channel never differ)
+# get ALSA master volume in percentage
+# (assumes that left and right channel are equal)
 
-# looks ugly at first, but works efficiently
-# (checks only right channel)
-data="$(amixer get Master \
-            | sed --quiet --regexp-extended \
-                  '$s;^(.*)\[([0-9]{1,3})%\] \[([a-z]{2,3})\];\2 \3;p' \
-      )"
-
-[ "${data##* }" = off ] && echo muted || echo "${data%% *}"
+amixer get Master \
+      | tail --lines=1 \
+      | awk '{ print $5 }' \
+      | tr --delete '[%]'
