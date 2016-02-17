@@ -2,8 +2,8 @@
 # filter all URIs, show them in dmenu and copy selection to clipboard
 # (mainly used by st's externalpipe patch)
 
-sed --regexp-extended "s/( |,|;|<|>|\(|\)|│|'|\")/\n/g" \
-	| grep --ignore-case --extended-regexp \
+tr --squeeze-repeats ' ,;<>\()"│' '\n' \
+	| grep --text --ignore-case --extended-regexp \
 		'(git|https?|s?ftp|rsync|ssh)://' \
 	| sort --ignore-case --unique \
 	| dmenu -f -i -l 10 \
