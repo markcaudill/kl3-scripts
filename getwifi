@@ -1,0 +1,14 @@
+#!/bin/sh
+# get current SSID and local IP otherwise 'down'
+
+# requires root privileges
+ssid_ip="$(sudo wpa_cli status \
+         | sed --quiet \
+            '4s/^ssid=//p;11s/^ip_address=//p' \
+         | tr '\n' ' ' \
+         )"
+
+# remove single trailing whitespace
+ssid_ip="${ssid_ip%\ }"
+
+echo "${ssid_ip:=down}"
