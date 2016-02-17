@@ -1,5 +1,5 @@
 #!/bin/sh
-# get current SSID and local IP otherwise 'down'
+# get SSID and local IP if connected otherwise 'down'
 
 # requires root privileges
 ssid_ip="$(sudo wpa_cli status \
