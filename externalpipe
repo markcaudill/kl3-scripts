@@ -1,6 +1,5 @@
 #!/bin/sh
-# filter all URIs, show them in dmenu and copy selection to clipboard
-# (mainly used by st's externalpipe patch)
+# filter basic URLs, show them in dmenu and copy selection to clipboard
 
 tr --squeeze-repeats ' ,;<>\()"│' '\n' \
 	| grep --text --ignore-case --extended-regexp \
