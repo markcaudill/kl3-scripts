@@ -1,10 +1,10 @@
 #!/bin/sh
 # filter basic URLs, show them in dmenu and copy selection to clipboard
 
-tr --squeeze-repeats ' ,;<>\()"│' '\n' \
-	| grep --text --ignore-case --extended-regexp \
+tr -s ' ,;<>\()"│' '\n' \
+	| grep -a -i -E \
 		'(git|https?|s?ftp|rsync|ssh)://' \
-	| sort --ignore-case --unique \
+	| sort -f -u \
 	| dmenu -f -i -l 10 \
-	| tr --delete '\n' \
-	| xsel --input
+	| tr -d '\n' \
+	| xsel -i

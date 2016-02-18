@@ -3,6 +3,6 @@
 # (assumes that left and right channel are equal)
 
 amixer get Master \
-      | tail --lines=1 \
+      | tail -n1 \
       | awk '{ print $5 }' \
-      | tr --delete '[%]'
+      | tr -d '[%]'

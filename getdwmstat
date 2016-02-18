@@ -2,4 +2,4 @@
 # get dwm's status (source: http://dwm.suckless.org/dwmgetstatus)
 
 xprop -root -notype -f WM_NAME 8u \
-   | sed --quiet --regexp-extended '5s,WM_NAME = \"(.*)\",\1,p'
+   | sed -n -r '5s,WM_NAME = \"(.*)\",\1,p'

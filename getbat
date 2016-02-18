@@ -5,7 +5,7 @@
 dir=/sys/class/power_supply/BAT0
 
 # check charging status
-grep --quiet ^Charging "${dir}"/status && echo -n + || echo -n -
+grep -q ^Charging "${dir}"/status && echo -n + || echo -n -
 
 ## Do it the hard way
 #printf 'scale=2; %d / %d * 100 \n' \
