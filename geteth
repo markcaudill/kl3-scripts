@@ -1,0 +1,8 @@
+#!/bin/sh
+# get local IP address of ethernet adapter (enp0s25)
+
+ip=$(ip addr show enp0s25 \
+	| sed -n '3s, *inet \(.*\)/.*,\1,p' \
+   )
+
+echo "${ip:=down}"
