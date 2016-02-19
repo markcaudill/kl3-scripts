@@ -3,10 +3,9 @@
 
 # requires root privileges
 ssid_ip="$(sudo wpa_cli status \
-         | sed -n '4s/^ssid=//p;11s/^ip_address=//p' \
-         | tr '\n' ' ' \
+                  | sed -n '4s/^ssid=//p;11s/^ip_address=//p' \
+                  | tr '\n' ' ' \
          )"
-
 # remove single trailing whitespace
 ssid_ip="${ssid_ip%\ }"
 
