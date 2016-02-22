@@ -2,8 +2,9 @@
 # get current song title and artist from cmus otherwise 'paused'
 
 query=$(cmus-remote -Q 2>/dev/null)
+[ -z "${query}" ] && exit 0
 
-[ -z "${query}" ] && echo paused && exit 0
+echo "${query}" | grep -q -x 'status paused' && echo paused && exit 0
 
 title=$(echo "${query}" \
 	| sed -n 's/tag title //p' \
