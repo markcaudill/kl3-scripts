@@ -1,0 +1,21 @@
+#!/bin/sh
+# simple power menu
+
+sel=$(printf "shutdown\nreboot\nsuspend\nlock" \
+	| dmenu -f -i -l 4 \
+)
+
+case "${sel}" in
+	'shutdown')
+		systemctl poweroff
+		;;
+	'reboot')
+		systemctl reboot
+		;;
+	'suspend')
+		systemctl suspend
+		;;
+	'lock')
+		lock
+		;;
+esac
