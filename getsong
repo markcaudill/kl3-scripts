@@ -1,0 +1,18 @@
+#!/bin/sh
+# get current song title and artist from cmus otherwise 'paused'
+
+query=$(cmus-remote -Q 2>/dev/null)
+
+[ -z "${query}" ] && echo paused && exit 0
+
+title=$(echo "${query}" \
+	| sed -n 's/tag title //p' \
+)
+artist=$(echo "${query}" \
+	| sed -n 's/tag artist //p' \
+)
+
+# print at most 20 characters of title and artist each
+printf "%s - %s\n" \
+	"${title:0:20}" \
+	"${artist:0:20}"
