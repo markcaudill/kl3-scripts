@@ -5,6 +5,6 @@ tr -s ' ,;<>\()"│' '\n' \
 	| grep -a -i -E \
 		'(git|https?|s?ftp|rsync|ssh)://' \
 	| sort -f -u \
-	| dmenu -f -i -l 10 \
+	| dmenu -f -i -l 20 \
 	| tr -d '\n' \
 	| xsel -i
