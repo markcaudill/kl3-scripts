@@ -1,8 +1,11 @@
 #!/bin/sh
 # lock screen and take care of related things
 
-# turn off display and battery status
-xset dpms force off && pkill -SIGKILL xbattmon
+# turn off display
+xset dpms force off
+
+# disable battery status line
+pkill -SIGKILL xbattmon
 
 # lock screen and show battery status again
 slock xbattmon
