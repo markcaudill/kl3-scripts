@@ -1,17 +1,8 @@
 #!/bin/sh
-# get battery status in ±percentage depending on whether it's charging or not
+# get battery status in [+]percentage [if charging]
 
-# platform specific
 dir=/sys/class/power_supply/BAT0
 
-# check charging status
-grep -q ^Charging "${dir}"/status && echo -n + || echo -n -
-
-## Do it the hard way
-#printf 'scale=2; %d / %d * 100 \n' \
-#   "$(cat "${dir}"/charge_now)" \
-#   "$(cat "${dir}"/charge_full_design)" \
-#   | bc \
-#   | cut -d. -f1
+grep -q ^C "${dir}"/status && printf +
 
 cat "${dir}"/capacity
