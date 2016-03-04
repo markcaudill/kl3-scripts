@@ -1,21 +1,15 @@
 #!/bin/sh
-# simple power menu
+# switch power state using dmenu
 
-sel=$(printf "shutdown\nreboot\nsuspend\nlock" \
+sel=$(printf 'poweroff\nreboot\nsuspend\nlock' \
 	| dmenu -f -i -l 4 \
 )
 
 case "${sel}" in
-	'shutdown')
-		systemctl poweroff
+	poweroff|reboot|suspend)
+		systemctl "${sel}"
 		;;
-	'reboot')
-		systemctl reboot
-		;;
-	'suspend')
-		systemctl suspend
-		;;
-	'lock')
+	lock)
 		lock
 		;;
 esac
