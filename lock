@@ -1,18 +1,12 @@
 #!/bin/sh
 # lock the session
 
-# turn off display
 xset dpms force off
-
-# disable battery status line
 pkill -SIGKILL xbattmon
 
-# lock screen
 slock
 
-# show battery status again
 xbattmon &
 
-# Show mugshot and save it if present
 [ -f ~/slock.jpg ] \
-	&& meh ~/slock.jpg && mv ~/slock.jpg ~/slock-last.jpg
+	&& meh ~/slock.jpg && mv -f ~/slock.jpg ~/slock-last.jpg
