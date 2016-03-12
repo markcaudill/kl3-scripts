@@ -5,17 +5,15 @@ query=$(cmus-remote -Q 2>/dev/null)
 # quit if cmus is not running
 [ $? -ne 0 ] && exit 1
 
-printf '%s' "${query}" \
-	| grep -q -x -m1 'status playing'
-[ $? -ne 0 ] &&	printf 'paused\n' && exit 0
-
 # get title and artist
-IFS=$(printf '\v') read -r title artist <<- _EOF_
+IFS=$(printf '\v') read -r status title artist << EOF
 $(printf '%s' "${query}" \
-	| sed -n -r 's/tag (title|artist) //p' \
+	| sed -n 's/^\(status\|tag \(title\|artist\)\) //p' \
 	| tr '\n' '\v' \
 )
-_EOF_
+EOF
 
 # print at most 20 characters of title and artist each
-printf '%s - %s\n' "${title:0:20}" "${artist:0:20}"
+[ "${status}" = playing ] \
+	&& printf '%s - %s\n' "${title:0:20}" "${artist:0:20}" \
+	|| printf 'paused\n'
