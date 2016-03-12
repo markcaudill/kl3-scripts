@@ -1,5 +1,5 @@
 #!/bin/sh
-# lock screen and take care of related things
+# lock the session
 
 # turn off display
 xset dpms force off
@@ -14,4 +14,5 @@ slock
 xbattmon &
 
 # Show mugshot and save it if present
-[ -f ~/slock.jpg ] && meh ~/slock.jpg && mv ~/slock.jpg ~/slock-last.jpg
+[ -f ~/slock.jpg ] \
+	&& meh ~/slock.jpg && mv ~/slock.jpg ~/slock-last.jpg
