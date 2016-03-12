@@ -7,8 +7,11 @@ xset dpms force off
 # disable battery status line
 pkill -SIGKILL xbattmon
 
-# lock screen and show battery status again
-slock xbattmon
+# lock screen
+slock
+
+# show battery status again
+xbattmon &
 
 # Show mugshot and save it if present
 [ -f ~/slock.jpg ] && meh ~/slock.jpg && mv ~/slock.jpg ~/slock-last.jpg
