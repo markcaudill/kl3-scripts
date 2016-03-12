@@ -1,12 +1,10 @@
 #!/bin/sh
 # get SSID and local IP if connected otherwise 'down'
 
-# requires root privileges
-ssid_ip="$(sudo wpa_cli status \
-                  | sed -n '4s/^ssid=//p;11s/^ip_address=//p' \
-                  | tr '\n' ' ' \
-         )"
-# remove single trailing whitespace
-ssid_ip="${ssid_ip%\ }"
+# Requires root privileges
+ssid_ip=$(sudo wpa_cli status \
+         | sed -n '4s/^ssid=//p;11s/^ip_address=//p' \
+)
 
-echo "${ssid_ip:=down}"
+# echo gets rid of trailing whitespace and does s,\n, , as well
+echo ${ssid_ip:=down}
