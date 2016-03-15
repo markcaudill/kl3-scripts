@@ -1,0 +1,35 @@
+#!/bin/sh
+# Handle external monitor when de/attaching from/to docking station
+# Absoloute paths are used to ensure capability with environments where $PATH
+# may not contain the executables used in here, for example when using this
+# script by some udev rule.
+
+# Identify correct monitor via hash of its EDID data
+printf '%s %s' \
+	    c41342d4f95b57f9f862a459882b86d468347a3f \
+	    /sys/devices/pci0000:00/0000:00:02.0/drm/card0/card0-HDMI-A-2/edid \
+	| /usr/bin/sha1sum -c --strict --status
+# 0 if match otherwise 1
+is_docked=$?
+
+XRANDR="/usr/bin/xrandr -d ${DISPLAY}"
+# Monitor is always connected via HDMI2 (DVI1 on dock)
+conector=HDMI2
+# Only 1440p 30Hz is used
+res_freq='2560 1440 30'
+# Get modeline
+mode=$(gtf ${res_freq} | sed -n '3s,  Modeline ,,p')
+mode_name=${mode%% *}
+
+if [ ${is_docked} ]; then
+	${XRANDR} --newmode ${mode}
+	${XRANDR} --addmode "${conector}" "${mode_name}"
+else
+	# Undocked or unrecognized state
+	${XRANDR} --output "${conector}" --off
+	${XRANDR} --delmode "${conector}" "${mode_name}"
+	${XRANDR} --rmmode "${mode_name}"
+fi
+
+# Toggle xrandr
+${XRANDR} --output "${conector}" --auto --rotate inverted --right-of LVDS1 
