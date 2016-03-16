@@ -1,17 +1,12 @@
 #!/bin/sh
-# Watch YouTube or other video URL supported by youtube-dl reading either stdin
-# or shell arguments
+# Stream video URL through youtube-dl reading stdin or shell arguments
 
-# Shell arguments
 if [ ${#} -gt 0 ]; then
-	echo arg
+	# Shell arguments
 	youtube-dl "${1}" -o - | mpv -
-	exit
-# stdin
 elif [ ! -t 0 ]; then
-	echo stdin
+	# stdin
 	youtube-dl -a - -o - | mpv -
-	exit
 fi
 
-exit 1
+exit
