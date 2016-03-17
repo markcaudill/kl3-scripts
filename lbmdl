@@ -16,11 +16,11 @@ input() {
 	return 0
 }
 
-# Mirror changes from remote repository to local destination folder while
-# never removing local files, preserving partial files and showing progress
+# Mirror changes from remote repository to local destination folder
+#	- Newer files won't be updated
+#	- Files will never be deleted
 download() {
-	rsync -r -u -l --safe-links --munge-links -H -X -t -O -J \
-		--preallocate -x -m -I --stats -h -P -i \
+	rsync -r -u -l -H -m -I -h -P --exclude=index.php \
 		"${remote}" \
 		"${1}"
 }
