@@ -1,0 +1,49 @@
+#!/bin/sh
+# Download music from libreboot's free music repository
+
+readonly remote=rsync://rsync.libreboot.org/music
+
+die() {
+	printf 'Error: %s\n' "${@}" 1>&2
+	exit 1
+}
+
+# Return 0/true if answer is y|Y otherwise 1/false
+input() {
+	read -r answer
+	[ "${answer}" == y ] || [ "${answer}" == Y ] \
+		|| return 1
+	return 0
+}
+
+# Mirror changes from remote repository to local destination folder while
+# never removing local files, preserving partial files and showing progress
+download() {
+	rsync -r -u -l --safe-links --munge-links -H -X -t -O -J \
+		--preallocate -x -m -I --stats -h -P -i \
+		"${remote}" \
+		"${1}"
+}
+
+# Check destination folder and possibly create it otherwise exit
+check_dest() {
+	if [ ! -d "${1}" ]; then
+		printf 'Destination directory does not exist, create it now? [yN]: '
+		input || return 1
+		mkdir -p -v "${1}"
+	fi
+	return 0
+}
+
+[ ${#} -ne 1 ] && die 'Wrong number of arguments.'
+
+printf '%s currently contains %sG of data, download it now? [yN]: ' \
+	"${remote}" \
+	"$(rsync -r "${remote}" \
+		| awk '{ gsub(/,/,"",$2); s += $2 } END { print s / 1024 ** 3 }')"
+
+input || exit 0
+
+check_dest "${1}" || die 'Missing destination directory.'
+
+download "${1}"
