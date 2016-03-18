@@ -37,12 +37,10 @@ check_dest() {
 
 [ ${#} -ne 1 ] && die 'Wrong number of arguments.'
 
-printf '%s currently contains %sG of data, download it now? [yN]: ' \
+printf '%s currently contains %sG of data.\n' \
 	"${remote}" \
 	"$(rsync -r "${remote}" \
 	| awk '{ gsub(/,/,"",$2); s += $2 } END { print (s / 1073741824) }')"
-
-input || exit 0
 
 check_dest "${1}" || die 'Missing destination directory.'
 
