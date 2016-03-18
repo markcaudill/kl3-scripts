@@ -1,47 +1,20 @@
 #!/bin/sh
 # Download music from libreboot's free music repository
 
+[ ${#} -ne 1 ] && printf 'USAGE:\tlbmdl <destination>.\n' 1>&2 && exit 1
+
 readonly remote=rsync://rsync.libreboot.org/music
 
-die() {
-	printf 'Error: %s\n' "${@}" 1>&2
-	exit 1
-}
-
-# Return 0/true if answer is y|Y otherwise 1/false
-input() {
-	read -r answer
-	[ "${answer}" == y ] || [ "${answer}" == Y ] \
-		|| return 1
-	return 0
-}
-
-# Mirror changes from remote repository to local destination folder
-#	- Newer files won't be updated
-#	- Files will never be deleted
-download() {
-	rsync -r -u -l -H -m -I -h -P --exclude=index.php \
-		"${remote}" \
-		"${1}"
-}
-
-# Check destination folder and possibly create it otherwise exit
-check_dest() {
-	if [ ! -d "${1}" ]; then
-		printf 'Destination directory does not exist, create it now? [yN]: '
-		input || return 1
-		mkdir -p -v "${1}"
-	fi
-	return 0
-}
-
-[ ${#} -ne 1 ] && die 'Wrong number of arguments.'
-
-printf '%s currently contains %sG of data.\n' \
+printf '%s currently contains %sG of data.\n\n' \
 	"${remote}" \
 	"$(rsync -r "${remote}" \
 		| awk '{ gsub(/,/,"",$2); s += $2 } END \
 			{ print (s / 1073741824) }' \
 	)"
 
-download "${1}"
+# Mirror changes from remote repository to local destination folder
+#	- Newer files won't be updated
+#	- Files will never be deleted
+rsync -r -u -l -H -m -I -h -P --exclude=index.php \
+	"${remote}" \
+	"${1}"
