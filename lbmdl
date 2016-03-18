@@ -40,6 +40,8 @@ check_dest() {
 printf '%s currently contains %sG of data.\n' \
 	"${remote}" \
 	"$(rsync -r "${remote}" \
-	| awk '{ gsub(/,/,"",$2); s += $2 } END { print (s / 1073741824) }')"
+		| awk '{ gsub(/,/,"",$2); s += $2 } END \
+			{ print (s / 1073741824) }' \
+	)"
 
 download "${1}"
