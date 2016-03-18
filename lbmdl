@@ -40,7 +40,7 @@ check_dest() {
 printf '%s currently contains %sG of data, download it now? [yN]: ' \
 	"${remote}" \
 	"$(rsync -r "${remote}" \
-		| awk '{ gsub(/,/,"",$2); s += $2 } END { print s / 1024 ** 3 }')"
+	| awk '{ gsub(/,/,"",$2); s += $2 } END { print (s / 1073741824) }')"
 
 input || exit 0
 
