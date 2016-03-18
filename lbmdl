@@ -42,6 +42,4 @@ printf '%s currently contains %sG of data.\n' \
 	"$(rsync -r "${remote}" \
 	| awk '{ gsub(/,/,"",$2); s += $2 } END { print (s / 1073741824) }')"
 
-check_dest "${1}" || die 'Missing destination directory.'
-
 download "${1}"
