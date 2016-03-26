@@ -3,7 +3,7 @@
 
 tr -s ' ,;<>\()"│' '\n' \
 	| grep -a -i -E \
-		'(git|https?|s?ftp|rsync|ssh)://' \
+		'(git|https?|s?ftp|rsync|rtmps?|ssh)://' \
 	| sort -f -u \
 	| dmenu -f -i -l 20 \
 	| tr -d '\n' \
