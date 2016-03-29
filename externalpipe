@@ -7,4 +7,4 @@ tr -s ' ,;<>\()"│' '\n' \
 	| sort -f -u \
 	| dmenu -f -i -l 20 \
 	| tr -d '\n' \
-	| xsel -i
+	| xclip -i
