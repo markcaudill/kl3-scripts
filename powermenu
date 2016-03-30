@@ -1,15 +1,15 @@
 #!/bin/sh
 # switch power state using dmenu
 
-sel=$(printf 'poweroff\nreboot\nsuspend\nlock' \
+options='lock
+poweroff
+reboot
+suspend
+'
+
+sel=$(printf '%s' "${options}" \
 	| dmenu -f -i -l 4 \
 )
 
-case "${sel}" in
-	poweroff|reboot|suspend)
-		systemctl "${sel}"
-		;;
-	lock)
-		lock
-		;;
-esac
+printf '%s' "${options}" | grep -q -x "${sel}" \
+	&& sudo ${sel}
