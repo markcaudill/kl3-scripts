@@ -33,3 +33,6 @@ fi
 
 # Toggle xrandr
 ${XRANDR} --output "${conector}" --auto --rotate inverted --right-of LVDS1 
+# Fix battery bar
+pkill -SIGKILL xbattmon
+xbattmon &
