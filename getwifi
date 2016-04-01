@@ -1,8 +1,7 @@
 #!/bin/sh
 # get SSID and local IP if connected otherwise 'down'
 
-# Requires root privileges
-ssid_ip=$(sudo wpa_cli status \
+ssid_ip=$(wpa_cli status \
          | sed -n '4s/^ssid=//p;11s/^ip_address=//p' \
 )
 
