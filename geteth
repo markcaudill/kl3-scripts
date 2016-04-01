@@ -1,7 +1,10 @@
 #!/bin/sh
 # get local IP address of ethernet adapter (enp0s25)
 
-ip=$(ip addr show eth0 \
+ip=$(ip addr show $(head -n3 /proc/net/dev \
+		     | tail -n1 \
+		     | cut -d':' -f1 \
+		  ) \
 	| sed -n '3s,    inet \(.*\)/.*,\1,p' \
    )
 
