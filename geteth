@@ -6,6 +6,6 @@ ip=$(ip addr show $(head -n3 /proc/net/dev \
 		     | cut -d':' -f1 \
 		  ) \
 	| sed -n '3s,    inet \(.*\)/.*,\1,p' \
-   )
+)
 
 printf '%s\n' "${ip:=down}"
