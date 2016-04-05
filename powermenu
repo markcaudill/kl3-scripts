@@ -11,5 +11,11 @@ sel=$(printf '%s' "${options}" \
 	| dmenu -f -i -l 4 \
 )
 
-printf '%s' "${options}" | grep -q -x "${sel}" \
-	&& sudo ${sel}
+case "${sel}" in
+	poweroff|reboot)
+		sudo "${sel}"
+		;;
+	lock|suspend)
+		"${sel}"
+		;;
+esac
