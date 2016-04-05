@@ -4,7 +4,7 @@
 xset dpms force off
 pkill -SIGKILL xbattmon
 
-slock
+slock ${@}
 
 xbattmon &
 
