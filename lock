@@ -9,4 +9,4 @@ slock ${@}
 xbattmon &
 
 [ -f ~/slock.jpg ] \
-	&& meh ~/slock.jpg && mv -f ~/slock.jpg ~/slock-last.jpg
+	&& sxiv -f -q ~/slock.jpg && mv -f ~/slock.jpg ~/slock-last.jpg
