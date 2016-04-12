@@ -1,0 +1,17 @@
+#!/bin/sh
+# Attach to existing tmux session or run $prog inside newly spawned one
+# USAGE:	$ ln -s tmuxify mutt; ./mutt
+
+# The symlink's name specifies the program to run
+prog=$(basename "${0}")
+echo $prog
+
+tmux has -t "${prog}" \
+	&& tmux attach -t "${prog}" \
+	|| tmux new -n "${prog}" -s "${prog}" \
+		$(find /usr/local/bin /usr/bin -maxdepth 1 \
+			-type f -name "${prog}" -print -quit \
+		)
+
+# ^ This find is a temporary workaround for 'wich --no-tilde' not being
+# available for all version of which(1)
