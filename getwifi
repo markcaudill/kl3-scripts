@@ -6,4 +6,4 @@ ssid_ip=$(wpa_cli status \
 )
 
 # echo gets rid of trailing whitespace and does s,\n, , as well
-echo ${ssid_ip:=down}
+echo ${ssid_ip:-down}

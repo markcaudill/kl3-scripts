@@ -5,4 +5,4 @@ ip=$(ip addr show "${1}" \
 	| sed -n '3s,    inet \(.*\)/.*,\1,p' \
 )
 
-printf '%s\n' "${ip:=down}"
+printf '%s\n' "${ip:-down}"
