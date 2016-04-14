@@ -1,0 +1,33 @@
+#!/bin/sh
+# Block entire services using iptables
+
+# List of services to block.
+as_list='
+714	# Apple
+8075	# Microsoft
+13335	# CloudFlare
+15169	# Google
+19679	# Dropbox
+20940	# Akamai
+32787	# Akamai (other)
+32934	# Facebook
+'
+api_url='https://stat.ripe.net/data/announced-prefixes/data.json?min_peers_seeing=0&resource='
+
+# Fetch all associated networks for each service
+networks=$(echo "${as_list}" \
+	| tr -d -c '[:digit:]\n' \
+	| xargs -n 1 -I as \
+		curl -s "${api_url}${as_fb}"as \
+			| sed -n 's,^ *"prefix": "\(.*\)"$,\1,p' \
+)
+
+## Reject entire networks
+# IPv4 
+echo "${networks}" | grep -F . \
+	| xargs -n 1 -I net \
+		iptables -A OUTPUT -d net -j REJECT
+# IPv6
+echo "${networks}" | grep -F : \
+	| xargs -n 1 -I net6 \
+		ip6tables -A OUTPUT -d net6 -j REJECT
