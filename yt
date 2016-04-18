@@ -3,7 +3,7 @@
 
 if [ ${#} -gt 0 ]; then
 	# Shell arguments
-	youtube-dl ${@} -o - | mpv --no-resume-playback -
+	youtube-dl "${@}" -o - | mpv --no-resume-playback -
 elif [ ! -t 0 ]; then
 	# stdin
 	youtube-dl -a - -o - | mpv --no-resume-playback -
