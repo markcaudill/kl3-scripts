@@ -1,8 +1,8 @@
 #!/bin/sh
 # get local IPv4 address of given network adapter otherwise 'down'
 
-ip=$(ip addr show "${1}" \
-	| sed -n '3s,    inet \(.*\)/.*,\1,p' \
+ip=$(ip -f inet -o address show "${1}" \
+	| sed -n '1s,^.*inet \(.*\)/.*,\1,p' \
 )
 
-printf '%s\n' "${ip:-down}"
+echo "${ip:-down}"
