@@ -1,9 +1,0 @@
-#!/bin/sh
-# get SSID and local IP if connected otherwise 'down'
-
-ssid_ip=$(wpa_cli status \
-         | sed -n '4s/^ssid=//p;11s/^ip_address=//p' \
-)
-
-# echo gets rid of trailing whitespace and does s,\n, , as well
-echo ${ssid_ip:-down}

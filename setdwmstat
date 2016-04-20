@@ -11,7 +11,7 @@ do
                                 | cut -d':' -f1 \
                         ) \
                 )" \
-                "$(getwifi)" \
+                "$(getssid)" \
                 "$(gettemp)" \
                 "$(getvol)" \
                 "$(date '+%a %d.%m.%y %H:%M')" \
