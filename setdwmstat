@@ -1,20 +1,20 @@
 #!/bin/sh
-# set dwm's status
+# set dwm's status bar
 
 while (true)
 do
-        xsetroot -name "$(printf '%s  %s  E: %s  W: %s  %d°C  %d%%  %s' \
-                "$(getsong)" \
-                "$(getvpn)" \
-                "$(getip4 $( head -n3 /proc/net/dev \
-                                | tail -n1 \
-                                | cut -d':' -f1 \
-                        ) \
-                )" \
-                "$(getssid)" \
-                "$(gettemp)" \
-                "$(getvol)" \
-                "$(date '+%a %d.%m.%y %H:%M')" \
-        )"
+	xsetroot -name "$(printf '%s  %s  E: %s  W: %s  %d°C  %d%%  %s' \
+		"$(getsong)" \
+		"$(getvpn)" \
+		"$(getip4 $( head -n3 /proc/net/dev \
+				| tail -n1 \
+				| cut -d':' -f1 \
+			) \
+		)" \
+		"$(getssid)" \
+		"$(gettemp)" \
+		"$(getvol)" \
+		"$(date '+%a %d.%m.%y %H:%M')" \
+	)"
 	sleep 30
 done
