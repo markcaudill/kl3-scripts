@@ -1,0 +1,8 @@
+#!/bin/sh
+# get local IPv6 address of given network adapter otherwise 'down'
+
+ip=$(ip -f inet6 -o address show "${1}" \
+	| sed -n '1s,^.*inet6 \(.*\):.*,\1,p' \
+)
+
+echo "${ip:-down}"
