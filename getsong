@@ -1,9 +1,9 @@
 #!/bin/sh
 # get current song title and artist from cmus otherwise 'paused'
 
-query=$(cmus-remote -Q 2>/dev/null)
 # quit if cmus is not running
-[ $? -ne 0 ] && exit 1
+query=$(cmus-remote -Q 2>/dev/null) \
+	|| exit 1
 
 # get title and artist
 IFS=$(printf '\v') read -r status title artist << EOF
