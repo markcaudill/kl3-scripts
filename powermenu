@@ -7,7 +7,7 @@ reboot
 suspend
 '
 
-sel=$(printf '%s' "${options}" \
+sel=$(echo "${options}" \
 	| dmenu -f -i -l 4 \
 )
 

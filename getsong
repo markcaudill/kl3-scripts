@@ -15,5 +15,5 @@ EOF
 
 # print at most 20 characters of title and artist each
 [ "${status}" = playing ] \
-	&& printf '%s - %s\n' "${title:0:20}" "${artist:0:20}" \
-	|| printf 'paused\n'
+	&& echo "${title:0:20} - ${artist:0:20}" \
+	|| echo paused
