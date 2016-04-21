@@ -1,9 +1,9 @@
 #!/bin/sh
 # Download music from libreboot's free music repository
 
-[ ${#} -ne 1 ] && printf 'USAGE:\tlbmdl <destination>.\n' 1>&2 && exit 1
+[ ${#} -ne 1 ] && echo 'USAGE:\tlbmdl <destination>' 1>&2 && exit 1
 
-readonly remote=rsync://rsync.libreboot.org/music
+remote=rsync://rsync.libreboot.org/music
 
 printf '%s currently contains %sG of data.\n\n' \
 	"${remote}" \
@@ -18,6 +18,3 @@ printf '%s currently contains %sG of data.\n\n' \
 rsync -r -u -l -H -m -I -h -P --exclude=index.php \
 	"${remote}" \
 	"${1}"
-
-printf 'See %s for tips on how to transcode multiple FLAC files.\n' \
-	'https://wiki.archlinux.org/index.php/Convert_Flac_to_Mp3'
