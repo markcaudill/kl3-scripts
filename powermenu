@@ -8,7 +8,7 @@ suspend
 '
 
 sel=$(echo "${options}" \
-	| dmenu -f -i -l 4 \
+	| dmenu -f -i -l 4
 )
 
 case "${sel}" in

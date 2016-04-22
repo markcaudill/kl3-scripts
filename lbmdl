@@ -9,7 +9,7 @@ printf '%s currently contains %sG of data.\n\n' \
 	"${remote}" \
 	"$(rsync -r "${remote}" \
 		| awk '{ gsub(/,/,"",$2); s += $2 } END \
-			{ print (s / 1073741824) }' \
+			{ print (s / 1073741824) }'
 	)"
 
 # Mirror changes from remote repository to local destination folder

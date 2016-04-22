@@ -2,8 +2,8 @@
 # Get RGB value of the pixel under the mouse
 
 xy=$(xdotool getmouselocation \
-	| tr ': ' ',' \
-	| cut -d',' -f2,4 \
+	| tr ': ' , \
+	| cut -d, -f2,4
 )
 
 import -window root png:- \

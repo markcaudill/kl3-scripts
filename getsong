@@ -4,14 +4,14 @@
 # quit if cmus is not running
 query=$(cmus-remote -Q \
 		2>/dev/null \
-		| head -n8 \
+		| head -n8
 ) || exit 1
 
 # get title and artist
 IFS=$(printf '\v') read -r status title artist << _EOF_
 $(printf '%s' "${query}" \
 	| sed -n 's/^\(status\|tag \(title\|artist\)\) //p' \
-	| tr '\n' '\v' \
+	| tr '\n' '\v'
 )
 _EOF_
 

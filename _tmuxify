@@ -9,7 +9,7 @@ tmux has -t "${prog}" \
 	&& tmux attach -t "${prog}" \
 	|| tmux new -n "${prog}" -s "${prog}" \
 		$(find /usr/local/bin /usr/bin -maxdepth 1 \
-			-type f -name "${prog}" -print -quit \
+			-type f -name "${prog}" -print -quit
 		) ${@}
 
 # ^ This find is a temporary workaround for 'wich --no-tilde' not being

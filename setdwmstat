@@ -8,13 +8,13 @@ do
 		"$(getvpn)" \
 		"$(getip4 $(head -n3 /proc/net/dev \
 				| tail -n1 \
-				| cut -d':' -f1 \
-			) \
+				| cut -d: -f1
+			)
 		)" \
 		"$(getssid)" \
 		"$(gettemp)" \
 		"$(getvol)" \
-		"$(date '+%a %d.%m.%y %H:%M')" \
+		"$(date '+%a %d.%m.%y %H:%M')"
 	)"
 	sleep 30
 done

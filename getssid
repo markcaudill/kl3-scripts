@@ -3,7 +3,7 @@
 
 ssid=$(wpa_cli status \
          | grep ^ssid \
-         | cut -d'=' -f2 \
+         | cut -d'=' -f2
 )
 
 echo "${ssid:-down}"

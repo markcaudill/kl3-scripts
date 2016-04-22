@@ -17,9 +17,9 @@ api_url='https://stat.ripe.net/data/announced-prefixes/data.json?min_peers_seein
 echo 'Fetch all associated networks for each service...'
 networks=$(curl -s $(echo "${as_list}" \
 			| tr -d -c '[:digit:]\n' \
-			| sed "/^$/d; s,^,${api_url},g" \
+			| sed "/^$/d; s,^,${api_url},g"
 	) \
-		| sed -n 's,^ *"prefix": "\(.*\)"$,\1,p' \
+		| sed -n 's,^ *"prefix": "\(.*\)"$,\1,p'
 )
 
 echo 'Block IPv4 ranges...'

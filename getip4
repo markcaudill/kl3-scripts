@@ -3,7 +3,7 @@
 
 ip=$(ip -f inet -o address show dev "${1}" primary \
 	| cut -d'/' -f1 \
-	| cut -d' ' -f7 \
+	| cut -d' ' -f7
 )
 
 echo "${ip:-down}"
