@@ -1,19 +1,20 @@
 #!/bin/sh
-# get current song title and artist from cmus otherwise 'paused'
+# get title and artist from cmus if playing otherwise 'paused'
 
 # quit if cmus is not running
-query=$(cmus-remote -Q 2>/dev/null) \
-	|| exit 1
+query=$(cmus-remote -Q \
+		2>/dev/null \
+		| head -n8 \
+) || exit 1
 
 # get title and artist
-IFS=$(printf '\v') read -r status title artist << EOF
+IFS=$(printf '\v') read -r status title artist << _EOF_
 $(printf '%s' "${query}" \
 	| sed -n 's/^\(status\|tag \(title\|artist\)\) //p' \
 	| tr '\n' '\v' \
 )
-EOF
+_EOF_
 
-# print at most 20 characters of title and artist each
 [ "${status}" = playing ] \
-	&& echo "${title:0:20} - ${artist:0:20}" \
+	&& echo "${title} - ${artist}" \
 	|| echo paused
