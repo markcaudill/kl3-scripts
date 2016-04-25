@@ -1,11 +1,13 @@
 #!/bin/sh
 # get title and artist from cmus if playing otherwise 'paused'
 
-# quit if cmus is not running
 query=$(cmus-remote -Q \
 		2>/dev/null \
 		| head -n8
-) || exit 1
+)
+
+# quit if cmus is not running
+[ -z "${query}" ] && exit 1
 
 # get title and artist
 IFS=$(printf '\v') read -r status title artist << _EOF_
