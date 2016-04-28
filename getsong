@@ -1,20 +1,23 @@
 #!/bin/sh
 # get title and artist from cmus if playing otherwise 'paused'
 
-query=$(cmus-remote -Q \
-		2>/dev/null \
-		| head -n8
-)
+query=$(cmus-remote -Q 2>/dev/null)
 
 # quit if cmus is not running
 [ -z "${query}" ] && exit 1
 
 # get title and artist
-IFS=$(printf '\v') read -r status title artist << _EOF_
-$(printf '%s' "${query}" \
-	| sed -n 's/^\(status\|tag \(title\|artist\)\) //p' \
-	| tr '\n' '\v'
-)
+while IFS=' ' read -r v1 v2 v3; do
+	case ${v1}_${v2} in
+		tag_title)
+			title="${v3}" ;;
+		tag_artist)
+			artist="${v3}" ;;
+		status_*)
+			status="${v2}" ;;
+	esac
+done << _EOF_
+$(echo "${query}")
 _EOF_
 
 [ "${status}" = playing ] \
