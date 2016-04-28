@@ -1,0 +1,18 @@
+#!/bin/sh
+# Fail with error message if VPN is not functioning otherwise 'active'
+
+abort() {
+	echo "${@}" 1>&2
+	exit 1
+}
+
+# fail if OpenVPN not running
+[ -f /run/openvpn*.pid ] || abort "not running"
+
+# fail if no tunnel present
+[ -z "$(ip tuntap show)" ] && abort "tunnel device missing"
+
+# TODO: more checks like external IP, etc.
+
+# connected to VPN
+echo active

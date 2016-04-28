@@ -5,7 +5,7 @@ while (true)
 do
 	xsetroot -name "$(printf '%s  %s  E: %s  W: %s  %d°C  %d%%  %s' \
 		"$(getsong)" \
-		"$(getvpn)" \
+		"$(checkvpn)" \
 		"$(getip4 $(head -n3 /proc/net/dev \
 				| tail -n1 \
 				| cut -d: -f1
