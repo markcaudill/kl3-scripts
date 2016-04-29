@@ -11,7 +11,7 @@ query=$(cmus-remote -Q \
 
 # get title and artist
 while IFS=' ' read -r v1 v2 v3; do
-	case ${v1}_${v2} in
+	case "${v1}_${v2}" in
 	tag_title)
 		title="${v3}" ;;
 	tag_artist)
