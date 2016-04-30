@@ -1,0 +1,5 @@
+#!/bin/sh
+# get title and artist from cmus
+
+cmus-remote -C 'format_print %t%%%a' \
+	| sed 's,%, - ,'
