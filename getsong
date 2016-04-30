@@ -3,7 +3,7 @@
 
 query=$(cmus-remote -Q \
 		2>/dev/null \
-		| head -n8
+		| head
 )
 
 # quit if cmus is not running
