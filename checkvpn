@@ -2,7 +2,7 @@
 # Fail with error message if VPN is not functioning otherwise 'active'
 
 abort() {
-	echo "${@}" 1>&2
+	printf '%s\n' "${1}" 1>&2
 	exit 1
 }
 
@@ -15,4 +15,4 @@ abort() {
 # TODO: more checks like external IP, etc.
 
 # connected to VPN
-echo active
+printf 'active\n'

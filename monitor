@@ -5,8 +5,9 @@
 # script by some udev rule.
 
 # Identify correct monitor via hash of its EDID data
-echo c41342d4f95b57f9f862a459882b86d468347a3f \
-	/sys/devices/pci0000:00/0000:00:02.0/drm/card0/card0-HDMI-A-2/edid \
+printf '%s %s' \
+	    c41342d4f95b57f9f862a459882b86d468347a3f \
+	    /sys/devices/pci0000:00/0000:00:02.0/drm/card0/card0-HDMI-A-2/edid \
 	| /usr/bin/sha1sum -c -s
 # 0 if match otherwise 1
 is_docked=$?

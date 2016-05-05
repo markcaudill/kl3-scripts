@@ -14,22 +14,22 @@ as_list='
 # Note the escaped &
 api_url='https://stat.ripe.net/data/announced-prefixes/data.json?min_peers_seeing=0\&resource='
 
-echo 'Fetch all associated networks for each service...'
-networks=$(curl -s $(echo "${as_list}" \
+printf 'Fetch all associated networks for each service...\n'
+networks=$(curl -s $(printf '%s' "${as_list}" \
 			| tr -d -c '[:digit:]\n' \
 			| sed "/^$/d; s,^,${api_url},g"
 	) \
 		| sed -n 's,^ *"prefix": "\(.*\)"$,\1,p'
 )
 
-echo 'Block IPv4 ranges...'
+printf 'Block IPv4 ranges...\n'
 # Requires root privileges
-echo "${networks}" | grep -F . \
+printf '%s' "${networks}" | grep -F . \
 	| xargs -n 1 -I net \
 		sudo iptables -A OUTPUT -d net -j REJECT
 
-echo 'Block IPv6 ranges...'
+printf 'Block IPv6 ranges...\n'
 # Requires root privileges
-echo "${networks}" | grep -F : \
+printf '%s' "${networks}" | grep -F : \
 	| xargs -n 1 -I net6 \
 		sudo ip6tables -A OUTPUT -d net6 -j REJECT

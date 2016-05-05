@@ -1,7 +1,7 @@
 #!/bin/sh
 # Download music from libreboot's free music repository
 
-[ ${#} -ne 1 ] && echo 'USAGE:\tlbmdl <destination>' 1>&2 && exit 1
+[ ${#} -ne 1 ] && printf 'USAGE:\tlbmdl <destination>\n' 1>&2 && exit 1
 
 remote=rsync://rsync.libreboot.org/music
 

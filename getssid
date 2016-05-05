@@ -6,4 +6,4 @@ ssid=$(wpa_cli status \
          | cut -d'=' -f2
 )
 
-echo "${ssid:-down}"
+printf '%s\n' "${ssid:-down}"

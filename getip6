@@ -6,4 +6,4 @@ ip=$(ip -f inet6 -o address show dev "${1}" primary \
 	| cut -d' ' -f7
 )
 
-echo "${ip:-down}"
+printf '%s\n' "${ip:-down}"

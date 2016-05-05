@@ -20,9 +20,9 @@ while IFS=' ' read -r v1 v2 v3; do
 		status="${v2}" ;;
 	esac
 done << _EOF_
-$(echo "${query}")
+$(printf '%s\n' "${query}")
 _EOF_
 
 [ "${status}" = playing ] \
-	&& echo "${title} - ${artist}" \
-	|| echo paused
+	&& printf '%s - %s\n' "${title}" "${artist}" \
+	|| printf 'paused\n'
