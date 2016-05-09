@@ -22,14 +22,22 @@ networks=$(curl -s $(printf '%s' "${as_list}" \
 		| sed -n 's,^ *"prefix": "\(.*\)"$,\1,p'
 )
 
+setname=netblock
+
+# Create sets to store IP addresses in
+sudo ipset create "${setname}" hash:net family inet hashsize 4096
+sudo ipset create "${setname}"6 hash:net family inet6 hashsize 4096
+
+# Add sets to netfilter
+sudo iptables -I OUTPUT 1 -m set --match-set "${setname}" dst -j REJECT
+sudo ip6tables -I OUTPUT 1 -m set --match-set "${setname}"6 dst -j REJECT
+
 printf 'Block IPv4 ranges...\n'
-# Requires root privileges
 printf '%s' "${networks}" | grep -F . \
-	| xargs -n 1 -I net \
-		sudo iptables -A OUTPUT -d net -j REJECT
+	| xargs -n 1 -I _net_ \
+		sudo ipset add "${setname}" _net_
 
 printf 'Block IPv6 ranges...\n'
-# Requires root privileges
 printf '%s' "${networks}" | grep -F : \
-	| xargs -n 1 -I net6 \
-		sudo ip6tables -A OUTPUT -d net6 -j REJECT
+	| xargs -n 1 -I _net6_ \
+		sudo ipset add "${setname}"6 _net6_
