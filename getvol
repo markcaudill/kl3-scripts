@@ -1,8 +1,7 @@
 #!/bin/sh
 # get ALSA master volume in percentage
-# (assumes that left and right channel are equal)
 
 amixer get Master \
       | tail -n1 \
-      | grep -o -E '[0-9]{1,3}%' \
-      | tr -d %
+      | awk '{ print $4 }' \
+      | tr -d [%]
