@@ -24,6 +24,10 @@ networks=$(curl -s $(printf '%s' "${as_list}" \
 
 setname=netblock
 
+printf 'Creating/Updating hashtables...\n'
+sudo ipset -quiet flush "${setname}"
+sudo ipset -quiet flush "${setname}"6
+
 sudo ipset -exist create "${setname}" \
 	hash:net family inet hashsize 4096 maxelem 8192
 sudo ipset -exist create "${setname}"6 \
