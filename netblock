@@ -29,7 +29,7 @@ sudo ipset -quiet flush "${setname}"
 sudo ipset -quiet flush "${setname}"6
 
 sudo ipset -exist create "${setname}" \
-	hash:net family inet hashsize 2048 maxelem 4096
+	hash:net family inet hashsize 1024 maxelem 4096
 sudo ipset -exist create "${setname}"6 \
 	hash:net family inet6 hashsize 1024 maxelem 1024
 
