@@ -14,9 +14,11 @@ as_list='
 # Note the escaped &
 api_url='https://stat.ripe.net/data/announced-prefixes/data.json?min_peers_seeing=0\&resource='
 
+name=$(basename ${0})
+
 # Securely write parsed JSON data to temporary file
 umask 0177
-tmpfile=/tmp/netblock-$(od -N4 -tx /dev/random | tr -d 0[:space:])
+tmpfile=/tmp/"${name}"-$(od -N4 -tx /dev/random | tr -d 0[:space:])
 
 curl -s $(printf '%s' "${as_list}" \
 		| tr -d -c '[:digit:]\n' \
@@ -25,33 +27,31 @@ curl -s $(printf '%s' "${as_list}" \
 	| sed -n 's,^ *"prefix": "\(.*\)"$,\1,p' \
 	> "${tmpfile}"
 
-setname=netblock
-
 # Do not keep potentially outdated networks
-sudo ipset -quiet flush "${setname}"
-sudo ipset -quiet flush "${setname}"6
+sudo ipset -quiet flush "${name}"
+sudo ipset -quiet flush "${name}"6
 
 # Create hash tables
-sudo ipset -exist create "${setname}" \
+sudo ipset -exist create "${name}" \
 	hash:net family inet hashsize 1024 maxelem 4096
-sudo ipset -exist create "${setname}"6 \
+sudo ipset -exist create "${name}"6 \
 	hash:net family inet6 hashsize 1024 maxelem 1024
 
 # Add rules on top to be processed first
 sudo iptables --table filter --insert OUTPUT 1 \
-	--match set --match-set "${setname}" \
+	--match set --match-set "${name}" \
 	dst --jump REJECT
 sudo ip6tables --table filter --insert OUTPUT 1 \
-	--match set --match-set "${setname}"6 \
+	--match set --match-set "${name}"6 \
 	dst --jump REJECT
 
 # Fill hash tables with networks
 grep -F . "${tmpfile}" \
 	| xargs -n 1 -I _net_ \
-		sudo ipset add "${setname}" _net_
+		sudo ipset add "${name}" _net_
 
 grep -F : "${tmpfile}" \
 	| xargs -n 1 -I _net6_ \
-		sudo ipset add "${setname}"6 _net6_
+		sudo ipset add "${name}"6 _net6_
 
 trap "rm -f \"${tmpfile}\"" 0 1 2 3 15
