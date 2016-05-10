@@ -3,13 +3,13 @@
 
 # List of services to block
 as_list='
-714	# Apple
-8075	# Microsoft
-15169	# Google
-19679	# Dropbox
 20940	# Akamai
 32787	# Akamai (other)
+714	# Apple
+19679	# Dropbox
 32934	# Facebook
+15169	# Google
+8075	# Microsoft
 '
 # Note the escaped &
 api_url='https://stat.ripe.net/data/announced-prefixes/data.json?min_peers_seeing=0\&resource='
