@@ -14,7 +14,7 @@ as_list='
 # Note the escaped &
 api_url='https://stat.ripe.net/data/announced-prefixes/data.json?min_peers_seeing=0\&resource='
 
-name=$(basename ${0})
+name=$(basename "${0}")
 
 # Securely write parsed JSON data to temporary file
 umask 0177
@@ -26,8 +26,6 @@ curl -s $(printf '%s' "${as_list}" \
 	) \
 	| sed -n 's,^ *"prefix": "\(.*\)"$,\1,p' \
 	> "${tmpfile}"
-
-exit 0
 
 # Do not keep potentially outdated networks
 sudo ipset -quiet flush "${name}"
@@ -57,9 +55,9 @@ $(grep -F . "${tmpfile}")
 EOF
 
 while read _net6_; do
-	sudo upset add "${name}" _net6_
+	sudo upset add "${name}6" _net6_
 done << EOF
-$(grep -F . "${tmpfile}")
+$(grep -F : "${tmpfile}")
 EOF
 
 trap "rm -f \"${tmpfile}\"" 0 1 2 3 15
