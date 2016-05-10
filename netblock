@@ -31,11 +31,13 @@ curl -s $(printf '%s' "${as_list}" \
 sudo ipset -quiet flush "${name}"
 sudo ipset -quiet flush "${name}"6
 
-# Create hash tables
+# Create hash tables using only as many entries as needed
 sudo ipset -exist create "${name}" \
-	hash:net family inet hashsize 1024 maxelem 4096
+	hash:net family inet hashsize 1024 \
+	maxelem $(grep -cF . "${tmpfile}")
 sudo ipset -exist create "${name}"6 \
-	hash:net family inet6 hashsize 1024 maxelem 1024
+	hash:net family inet6 hashsize 1024 \
+	maxelem $(grep -cF : "${tmpfile}")
 
 # Add rules on top to be processed first
 sudo iptables --table filter --insert OUTPUT 1 \
