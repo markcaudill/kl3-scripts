@@ -27,6 +27,8 @@ curl -s $(printf '%s' "${as_list}" \
 	| sed -n 's,^ *"prefix": "\(.*\)"$,\1,p' \
 	> "${tmpfile}"
 
+exit 0
+
 # Do not keep potentially outdated networks
 sudo ipset -quiet flush "${name}"
 sudo ipset -quiet flush "${name}"6
@@ -48,12 +50,16 @@ sudo ip6tables --table filter --insert OUTPUT 1 \
 	dst --jump REJECT
 
 # Fill hash tables with networks
-grep -F . "${tmpfile}" \
-	| xargs -n 1 -I _net_ \
-		sudo ipset add "${name}" _net_
+while read _net_; do
+	sudo upset add "${name}" _net_
+done << EOF
+$(grep -F . "${tmpfile}")
+EOF
 
-grep -F : "${tmpfile}" \
-	| xargs -n 1 -I _net6_ \
-		sudo ipset add "${name}"6 _net6_
+while read _net6_; do
+	sudo upset add "${name}" _net6_
+done << EOF
+$(grep -F . "${tmpfile}")
+EOF
 
 trap "rm -f \"${tmpfile}\"" 0 1 2 3 15
