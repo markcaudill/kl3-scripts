@@ -14,12 +14,16 @@ as_list='
 # Note the escaped &
 api_url='https://stat.ripe.net/data/announced-prefixes/data.json?min_peers_seeing=0\&resource='
 
-networks=$(curl -s $(printf '%s' "${as_list}" \
-			| tr -d -c '[:digit:]\n' \
-			| sed "/^$/d; s,^,${api_url},g"
+# Securely write parsed JSON data to temporary file
+umask 0177
+tmpfile=/tmp/netblock-$(od -N4 -tx /dev/random | tr -d 0[:space:])
+
+curl -s $(printf '%s' "${as_list}" \
+		| tr -d -c '[:digit:]\n' \
+		| sed "/^$/d; s,^,${api_url},g"
 	) \
-		| sed -n 's,^ *"prefix": "\(.*\)"$,\1,p'
-)
+	| sed -n 's,^ *"prefix": "\(.*\)"$,\1,p' \
+	> "${tmpfile}"
 
 setname=netblock
 
@@ -42,10 +46,12 @@ sudo ip6tables --table filter --insert OUTPUT 1 \
 	dst --jump REJECT
 
 # Fill hash tables with networks
-printf '%s' "${networks}" | grep -F . \
+grep -F . "${tmpfile}" \
 	| xargs -n 1 -I _net_ \
 		sudo ipset add "${setname}" _net_
 
-printf '%s' "${networks}" | grep -F : \
+grep -F : "${tmpfile}" \
 	| xargs -n 1 -I _net6_ \
 		sudo ipset add "${setname}"6 _net6_
+
+trap "rm -f \"${tmpfile}\"" 0 1 2 3 15
