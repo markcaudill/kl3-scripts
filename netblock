@@ -10,6 +10,10 @@ as_list='
 32934	# Facebook
 15169	# Google
 8075	# Microsoft
+2906	# Netflix
+8403	# Spotify
+32590	# Valve
+8302	# Zattoo
 '
 # Note the escaped &
 api_url='https://stat.ripe.net/data/announced-prefixes/data.json?min_peers_seeing=0\&resource='
