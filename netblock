@@ -19,6 +19,7 @@ name=$(basename "${0}")
 # Securely write parsed JSON data to temporary file
 umask 0177
 tmpfile=/tmp/"${name}"-$(od -N4 -tx /dev/random | tr -d 0[:space:])
+trap "rm -f \"${tmpfile}\"" 0 1 2 3 15
 
 curl -s $(printf '%s' "${as_list}" \
 		| tr -d -c '[:digit:]\n' \
@@ -48,16 +49,14 @@ sudo ip6tables --table filter --insert OUTPUT 1 \
 	dst --jump REJECT
 
 # Fill hash tables with networks
-while read _net_; do
-	sudo upset add "${name}" _net_
+while read net; do
+	sudo ipset add "${name}" "${net}"
 done << EOF
 $(grep -F . "${tmpfile}")
 EOF
 
-while read _net6_; do
-	sudo upset add "${name}6" _net6_
+while read net6; do
+	sudo ipset add "${name}"6 "${net6}"
 done << EOF
 $(grep -F : "${tmpfile}")
 EOF
-
-trap "rm -f \"${tmpfile}\"" 0 1 2 3 15
