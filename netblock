@@ -32,7 +32,7 @@ curl -s $(printf '%s' "${as_list}" \
 	> "${tmpfile}"
 
 block() {
-	[ "${1}" = '4' ] && delim=. || delim=:
+	[ ${1} -eq 4 ] && delim=. || delim=:
 
 	# Do not keep potentially outdated networks
 	sudo ipset -quiet flush "${name}""${1}"
