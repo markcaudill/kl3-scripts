@@ -7,7 +7,7 @@ abort() {
 }
 
 # fail if OpenVPN not running
-[ -f /run/openvpn*.pid ] || abort "not running"
+[ -f "/run/openvpn*.pid" ] || abort "not running"
 
 # fail if no tunnel present
 [ -z "$(ip tuntap show)" ] && abort "tunnel device missing"
