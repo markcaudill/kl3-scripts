@@ -29,7 +29,7 @@ curl -s $(printf '%s' "${as_list}" \
 		| tr -d -c '[:digit:]\n' \
 		| sed "/^$/d; s,^,${api_url},g"
 	) \
-	| sed -n 's,^ *"prefix": "\(.*\)"$,\1,p' \
+	| awk -F\" '/\// { print $4 }' \
 	> "${tmpfile}"
 
 block() {
