@@ -32,35 +32,30 @@ curl -s $(printf '%s' "${as_list}" \
 	| sed -n 's,^ *"prefix": "\(.*\)"$,\1,p' \
 	> "${tmpfile}"
 
-# Do not keep potentially outdated networks
-sudo ipset -quiet flush "${name}"
-sudo ipset -quiet flush "${name}"6
+block() {
+	[ "${1}" = '4' ] && delim=. || delim=:
 
-# Create hash tables using only as many entries as needed
-sudo ipset -exist create "${name}" \
-	hash:net family inet hashsize 1024 \
-	maxelem $(grep -cF . "${tmpfile}")
-sudo ipset -exist create "${name}"6 \
-	hash:net family inet6 hashsize 1024 \
-	maxelem $(grep -cF : "${tmpfile}")
+	# Do not keep potentially outdated networks
+	sudo ipset -quiet flush "${name}""${1}"
 
-# Add rules on top to be processed first
-sudo iptables --table filter --insert OUTPUT 1 \
-	--match set --match-set "${name}" \
-	dst --jump REJECT
-sudo ip6tables --table filter --insert OUTPUT 1 \
-	--match set --match-set "${name}"6 \
-	dst --jump REJECT
+	# Create hash tables using only as many entries as needed
+	sudo ipset -exist create "${name}""${1}" \
+		hash:net family inet"${1#4}" hashsize 1024 \
+		maxelem $(grep -cF "${delim}" "${tmpfile}")
 
-# Fill hash tables with networks
-while read net; do
-	sudo ipset add "${name}" "${net}"
-done << EOF
-$(grep -F . "${tmpfile}")
-EOF
+	# Add rules on top to be processed first
+	sudo ip"${1#4}"tables --table filter --insert OUTPUT 1 \
+		--match set --match-set "${name}""${1}" \
+		dst --jump REJECT
 
-while read net6; do
-	sudo ipset add "${name}"6 "${net6}"
-done << EOF
-$(grep -F : "${tmpfile}")
-EOF
+	# Fill hash tables with networks
+	while read net; do
+		sudo ipset add "${name}""${1}" "${net}"
+	done <<- EOF
+	$(grep -F "${delim}" "${tmpfile}")
+	EOF
+}
+
+block 4
+block 6
+
