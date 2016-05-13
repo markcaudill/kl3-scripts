@@ -1,5 +1,5 @@
 #!/bin/sh
-# Fail with error message if VPN is not functioning otherwise 'active'
+# Return with error message if VPN is not functioning otherwise 'active'
 
 abort() {
 	printf '%s\n' "${1}" 1>&2
