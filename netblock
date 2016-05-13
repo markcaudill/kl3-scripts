@@ -15,8 +15,8 @@ as_list='
 32590	# Valve
 8302	# Zattoo
 '
-# Note the escaped &
-api_url='https://stat.ripe.net/data/announced-prefixes/data.json?min_peers_seeing=0\&resource='
+# Must be exported for later use with awk
+export api_url='https://stat.ripe.net/data/announced-prefixes/data.json?min_peers_seeing=0&resource='
 
 name=$(basename "${0}")
 
@@ -26,8 +26,7 @@ tmpfile=/tmp/"${name}"-$(od -N4 -tx /dev/random | tr -d 0[:space:])
 trap "rm -f \"${tmpfile}\"" 0 1 2 3 15
 
 curl -s $(printf '%s' "${as_list}" \
-		| tr -d -c '[:digit:]\n' \
-		| sed "/^$/d; s,^,${api_url},g"
+		| awk 'NR>1 { print ENVIRON["api_url"]$1 }'
 	) \
 	| awk -F\" '/\// { print $4 }' \
 	> "${tmpfile}"
