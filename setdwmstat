@@ -6,7 +6,7 @@ do
 	xsetroot -name "$(printf '%s  %s  E: %s  W: %s  %d°C  %d%%  %s' \
 		"$(sgetsong | head -c40)" \
 		"$(checkvpn)" \
-		"$(getip4 $(head -n3 /proc/net/dev \
+		"$(getip -4 $(head -n3 /proc/net/dev \
 				| tail -n1 \
 				| cut -d: -f1
 			)
