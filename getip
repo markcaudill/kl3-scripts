@@ -17,8 +17,8 @@ elif [ ${#} -ge 3 ]; then
 fi
 
 ip=$(ip ${opt} address show ${dev} primary up \
-	| cut -d/ -f1 \
-	| cut -d' ' -f7
+	| awk '{ print $4 }' \
+	| cut -d/ -f1
 )
 
 printf '%s\n' "${ip:-down}"
