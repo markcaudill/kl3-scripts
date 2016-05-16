@@ -22,7 +22,7 @@ name=${0##*/}
 
 # Securely write parsed JSON data to temporary file
 umask 0177
-tmpfile=/tmp/"${name}"-$(od -N4 -tx /dev/random | tr -d 0[:space:])
+tmpfile=/tmp/"${name}"-$(od -An -N4 -tx4 /dev/random | tr -d ' ')
 trap "rm -f \"${tmpfile}\"" 0 1 2 3 15
 
 curl -s $(printf '%s' "${as_list}" \
