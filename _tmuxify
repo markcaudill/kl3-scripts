@@ -8,9 +8,4 @@ prog=$(basename "${0}" | tail -c+2)
 tmux has -t "${prog}" \
 	&& tmux attach -t "${prog}" \
 	|| tmux new -n "${prog}" -s "${prog}" \
-		$(find /usr/local/bin /usr/bin -maxdepth 1 \
-			-type f -name "${prog}" -print -quit
-		) ${@}
-
-# ^ This find is a temporary workaround for 'wich --no-tilde' not being
-# available for all version of which(1)
+		$(which --skip-tilde "${prog}") ${@}
