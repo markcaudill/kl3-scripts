@@ -1,6 +1,6 @@
 #!/bin/sh
 # Attach to existing tmux session or run $prog inside newly spawned one
-# USAGE:	$ ln -s tmuxify mutt; ./mutt
+# USAGE:	$ ln -s _tmuxify mutt && ./mutt
 
 # The symlink's name specifies the program to run
 prog=$(basename "${0}" | tail -c+2)
