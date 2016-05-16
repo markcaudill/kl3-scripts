@@ -18,7 +18,7 @@ as_list='
 # Must be exported for later use with awk
 export api_url='https://stat.ripe.net/data/announced-prefixes/data.json?min_peers_seeing=0&resource='
 
-name=$(basename "${0}")
+name=${0##*/}
 
 # Securely write parsed JSON data to temporary file
 umask 0177

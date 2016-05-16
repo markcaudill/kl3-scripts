@@ -3,7 +3,7 @@
 # USAGE:	$ ln -s _tmuxify mutt && ./mutt
 
 # The symlink's name specifies the program to run
-prog=$(basename "${0}" | tail -c+2)
+prog=$(printf '%s' "${0##*/}" | tail -c+2)
 
 tmux has -t "${prog}" \
 	&& tmux attach -t "${prog}" \
