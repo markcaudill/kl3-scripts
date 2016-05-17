@@ -15,8 +15,7 @@ as_list='
 32590	# Valve
 8302	# Zattoo
 '
-# Must be exported for later use with awk
-export api_url='https://stat.ripe.net/data/announced-prefixes/data.json?min_peers_seeing=0&resource='
+api_url='https://stat.ripe.net/data/announced-prefixes/data.json?min_peers_seeing=0&resource='
 
 name=${0##*/}
 
@@ -26,7 +25,7 @@ tmpfile=/tmp/"${name}"-$(od -An -N4 -tx4 /dev/random | tr -d ' ')
 trap "rm -f \"${tmpfile}\"" 0 1 2 3 15
 
 curl -s $(printf '%s' "${as_list}" \
-		| awk 'NR>1 { print ENVIRON["api_url"]$1 }'
+		| awk 'NR>1 { print "'"${api_url}"'"$1 }'
 	) \
 	| awk -F\" '/\// { print $4 }' \
 	> "${tmpfile}"
