@@ -16,7 +16,7 @@ elif [ ${#} -ge 3 ]; then
 	exit 1
 fi
 
-ip=$(ip ${opt} address show ${dev} primary up \
+ip=$(ip ${opt} address show ${dev} scope global primary up \
 	| awk '{ print $4 }' \
 	| cut -d/ -f1
 )
