@@ -1,4 +1,4 @@
 #!/bin/sh
 # Lock screen before suspend to RAM
 
-slock sudo /usr/local/bin/suspend
+slock sudo $(which --skip-tilde suspend)
