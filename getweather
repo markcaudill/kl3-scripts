@@ -1,0 +1,5 @@
+#!/bin/sh
+# Get detailed weather forecast [for given city]
+
+curl -s http://wttr.in/"${1}" \
+	| less -R -E -X
