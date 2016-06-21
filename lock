@@ -1,5 +1,5 @@
 #!/bin/sh
-# lock the session
+# lock the session and save slock's mugshots
 
 xset dpms force off
 pkill -SIGKILL xbattmon
@@ -11,4 +11,5 @@ xbattmon &
 setdwmstat &
 
 [ -f ~/slock.jpg ] \
-	&& sxiv -f -q ~/slock.jpg && mv -f ~/slock.jpg ~/slock-last.jpg
+	&& sxiv -f -q ~/slock.jpg \
+	&& mv -f ~/slock.jpg ~/slock-pictures/$(date +%F-%T).jpg
