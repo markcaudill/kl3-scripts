@@ -3,9 +3,8 @@
 
 while (true)
 do
-	xsetroot -name "$(printf '%s  %s  E: %s  W: %s  %d°C  %d%%  %s' \
+	xsetroot -name "$(printf '%s  E: %s  W: %s  %d°C  %d%%  %s' \
 		"$(sgetsong | head -c40)" \
-		"$(checkvpn)" \
 		"$(getip $(ip -o link show \
 				| awk -F: '/e(th|np)[0-9]/ { print $2 }'
 			) \
