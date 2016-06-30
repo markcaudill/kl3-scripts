@@ -10,6 +10,7 @@ slock ${@}
 xbattmon &
 setdwmstat &
 
-[ -f ~/slock.jpg ] \
-	&& sxiv -f -q ~/slock.jpg \
-	&& mv -f ~/slock.jpg ~/slock-pictures/$(date +%F-%T).jpg
+if [ -f ~/slock.jpg ]; then
+	sxiv -f -q ~/slock.jpg &
+	mv -f ~/slock.jpg ~/slock-pictures/$(date +%F-%T).jpg
+fi
