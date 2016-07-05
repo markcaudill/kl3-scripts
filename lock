@@ -11,6 +11,6 @@ xbattmon &
 setdwmstat &
 
 if [ -f ~/slock.jpg ]; then
-	sxiv -f -q ~/slock.jpg &
-	mv -f ~/slock.jpg ~/slock-pictures/$(date +%F-%T).jpg
+	filepath=~/slock-pictures/slock-$(date +%F-%T).jpg
+	mv -f ~/slock.jpg ${filepath} && sxiv -f -q ${filepath}
 fi
