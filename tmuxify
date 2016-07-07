@@ -2,13 +2,14 @@
 # Attach to existing tmux session or run $PROGRAM inside newly spawned one
 # USAGE:	$ ln -s tmuxify mutt && ./mutt
 
-# The program's basename
 name=${0##*/}
-# Remove trailing underscore if present
-name=${name#_}
+# Execute first program found in $PATH except for the symlink itself to
+# avoid recursion
+execpath=$(which -a ${name} \
+		| grep -v ${PWD}/${name} \
+		| head -n1)
 
 tmux has -t "${name}" \
 	&& tmux attach -t "${name}" \
 	|| tmux new -n "${name}" -s "${name}" \
-		# Run the actual program from $PATH ignoring the wrapper
-		$(which --skip-tilde "${name}") ${@}
+		${execpath} ${@}
