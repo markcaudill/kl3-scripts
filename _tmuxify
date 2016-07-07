@@ -1,11 +1,14 @@
 #!/bin/sh
-# Attach to existing tmux session or run $prog inside newly spawned one
+# Attach to existing tmux session or run $PROGRAM inside newly spawned one
 # USAGE:	$ ln -s _tmuxify mutt && ./mutt
 
-# The symlink's name specifies the program to run
-prog=$(printf '%s' "${0##*/}" | tail -c+2)
+# The program's basename
+name=${0##*/}
+# Remove trailing underscore if present
+name=${name#_}
 
-tmux has -t "${prog}" \
-	&& tmux attach -t "${prog}" \
-	|| tmux new -n "${prog}" -s "${prog}" \
-		$(which --skip-tilde "${prog}") ${@}
+tmux has -t "${name}" \
+	&& tmux attach -t "${name}" \
+	|| tmux new -n "${name}" -s "${name}" \
+		# Run the actual program from $PATH ignoring the wrapper
+		$(which --skip-tilde "${name}") ${@}
