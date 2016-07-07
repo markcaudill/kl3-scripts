@@ -2,14 +2,14 @@
 # Attach to existing tmux session or run $PROGRAM inside newly spawned one
 # USAGE:	$ ln -s tmuxify mutt && ./mutt
 
+# The program's name
 name=${0##*/}
-# Execute first program found in $PATH except for the symlink itself to
-# avoid recursion
+# First binary found in $PATH not being the symlink to this script
 execpath=$(which -a ${name} \
-		| grep -v ${PWD}/${name} \
+		| grep -v ^"${HOME}" \
 		| head -n1)
 
 tmux has -t "${name}" \
 	&& tmux attach -t "${name}" \
 	|| tmux new -n "${name}" -s "${name}" \
-		${execpath} ${@}
+		"${execpath}" ${@}
