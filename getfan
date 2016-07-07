@@ -2,8 +2,7 @@
 # get CPU fan speed in RPM
 
 # platforn specific
-sed -n '2s/speed:\t\t//p' /proc/acpi/ibm/fan
+awk 'NR==2 { print $2 }' /proc/acpi/ibm/fan
 
-# alternatives
-#grep speed: /proc/acpi/ibm/fan | cut -f3
-#cut -f3 /proc/acpi/ibm/fan | sed -n 2p
+# alternative
+#sed -n '2{s/speed:\t\t//p;q}' /proc/acpi/ibm/fan
