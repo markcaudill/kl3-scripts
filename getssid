@@ -2,8 +2,7 @@
 # get the wifi network's SSID otherwise 'down'
 
 ssid=$(wpa_cli status \
-         | grep ^ssid \
-         | cut -d'=' -f2
+         | awk -F= '/^ssid/ { print $2 }'
 )
 
 printf '%s\n' "${ssid:-down}"
