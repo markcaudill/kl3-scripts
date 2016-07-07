@@ -1,6 +1,6 @@
 #!/bin/sh
 # Attach to existing tmux session or run $PROGRAM inside newly spawned one
-# USAGE:	$ ln -s _tmuxify mutt && ./mutt
+# USAGE:	$ ln -s tmuxify mutt && ./mutt
 
 # The program's basename
 name=${0##*/}
