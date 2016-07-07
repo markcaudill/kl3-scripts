@@ -3,13 +3,13 @@
 
 query=$(cmus-remote -Q \
 		2>/dev/null \
-		| head
+		| head -n10
 )
 
 # quit if cmus is not running
 [ -z "${query}" ] && exit 1
 
-# get title and artist
+# get title, artist and status
 while IFS=' ' read -r v1 v2 v3; do
 	case "${v1}_${v2}" in
 	tag_title)
