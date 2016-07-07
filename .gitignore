@@ -1,1 +1,5 @@
-externalpipe
+/externalpipe
+# Symlinks to tmuxify
+/calcurse
+/irc
+/mutt
