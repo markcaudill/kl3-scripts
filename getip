@@ -2,19 +2,22 @@
 # get local IP addresses otherwise 'down'
 
 opt=-o
-dev=
 
-if [ ${#} -eq 1 ]; then
+case ${#} in
+	1)
 	[ ${1} = '-4' ] || [ ${1} = '-6' ] \
 		&& opt="${opt} ${1}" \
 		|| dev="dev ${1}"
-elif [ ${#} -eq 2 ]; then
+	;;
+	2)
 	opt="${opt} ${1}"
 	dev="dev ${2}"
-elif [ ${#} -ge 3 ]; then
+	;;
+	3)
 	printf 'Usage: getip [-4|-6] [interface_name]\n'
 	exit 1
-fi
+	;;
+esac
 
 ip=$(ip ${opt} address show ${dev} scope global primary up \
 	| awk '{ print $4 }' \
