@@ -2,5 +2,5 @@
 # Print possible definition(s) of given git(1) alias(es)
 
 sed -n "/^\[alias\]\$/,\${
-	/^\t*${1}\t*= /p
+		/^\t*${1}\t*= /p
 	}" "${HOME}"/.gitconfig
