@@ -1,6 +1,9 @@
 #!/bin/sh
-# Print possible definition(s) of given git(1) alias(es)
+# type(1) for git(1) aliases
 
-sed -n "/^\[alias\]\$/,\${
-		/^\t*${1}\t*= /p
-	}" "${HOME}"/.gitconfig
+alias=$(sed -n "/^\[alias\]\$/,\${
+			/^\t*${1}\t*= /p
+		}" "${HOME}"/.gitconfig)
+
+# Print definition if found otherwise raise error
+printf '%s\n' "${alias:?${1} not found}"
