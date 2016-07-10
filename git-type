@@ -2,8 +2,8 @@
 # type(1) for git(1) aliases
 
 alias=$(sed -n "/^\[alias\]\$/,\$ {
-			/^[[:space:]]*${1}[[:space:]]*=[[:space:]]*/p
+			s/^[[:space:]]*${1}[[:space:]]*=[[:space:]]*//p
 		}" "${HOME}"/.gitconfig)
 
 # Print definition if found otherwise raise error
-printf '%s\n' "${alias:?${1} not found}"
+printf "%s is an alias for '%s'\n" "${1}" "${alias:?${1} not found}"
