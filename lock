@@ -2,8 +2,7 @@
 # lock the session and save slock's mugshots
 
 xset dpms force off
-pkill -SIGKILL xbattmon
-pkill -SIGKILL setdwmstat
+pkill -SIGKILL xbattmon\|setdwmstat
 
 slock ${@}
 
