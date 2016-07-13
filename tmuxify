@@ -3,13 +3,15 @@
 # USAGE:	$ ln -s tmuxify mutt && ./mutt
 
 # The program's name
-name=${0##*/}
-# First binary found in $PATH not being the symlink to this script
-execpath=$(which -a ${name} \
-		| grep -v ^"${HOME}" \
+name="${0##*/}"
+# This script's absoloute directory
+path=$(readlink "${0}")
+# First binary found in $PATH not being this script itself
+exe=$(which -a "${name}" \
+		| grep -v -E "^(${path%/*}|$(cd "${0%/*}" && pwd))" \
 		| head -n1)
 
 tmux has -t "${name}" \
 	&& tmux attach -t "${name}" \
 	|| tmux new -n "${name}" -s "${name}" \
-		"${execpath}" ${@}
+		"${exe}" ${@}
