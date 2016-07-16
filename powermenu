@@ -2,20 +2,21 @@
 # switch power state using dmenu
 
 options='lock
+lock-suspend
 poweroff
 reboot
 suspend
 '
 
 sel=$(printf '%s' "${options}" \
-	| dmenu -f -i -l 4
+	| dmenu -f -i -l 5
 )
 
 case "${sel}" in
-	poweroff|reboot)
-		sudo "${sel}"
-		;;
-	lock|suspend)
+	lock|lock-suspend)
 		"${sel}"
+		;;
+	poweroff|reboot|suspend)
+		sudo "${sel}"
 		;;
 esac

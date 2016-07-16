@@ -1,6 +1,0 @@
-#!/bin/sh
-# Lock screen before suspend to RAM
-
-slock sudo $(which -a suspend \
-		| grep -v ^${HOME} \
-		| head -n1)
