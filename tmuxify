@@ -11,6 +11,10 @@ exe=$(which -a "${name}" \
 		| grep -v -E "^(${path%/*}|$(cd "${0%/*}" && pwd))" \
 		| head -n1)
 
+[ -z "${exe}" ] \
+	&& printf '"%s" not found in $PATH.' "${name}" 1>&2 \
+	&& exit 1
+
 tmux has -t "${name}" \
 	&& exec tmux attach -t "${name}" \
 	|| exec tmux new -n "${name}" -s "${name}" \
