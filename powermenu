@@ -9,7 +9,8 @@ suspend
 '
 
 sel=$(printf '%s' "${options}" \
-	| dmenu -f -i -l 5
+	| dmenu -f -i -l 5 -p "${0##*/}" \
+		-fn "monospace:size=12"
 )
 
 case "${sel}" in
