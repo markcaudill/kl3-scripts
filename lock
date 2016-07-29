@@ -2,12 +2,10 @@
 # lock the session and save slock's mugshots
 
 xset dpms force off
-pkill -SIGKILL xbattmon\|setdwmstat
 
+pkill -SIGSTOP xbattmon\|setdwmstat
 slock ${@}
-
-xbattmon &
-setdwmstat &
+pkill -SIGCONT xbattmon\|setdwmstat
 
 if [ -f ~/slock.jpg ]; then
 	filepath=~/slock-pictures/slock-$(date +%F-%T).jpg
