@@ -1,4 +1,4 @@
 #!/bin/sh
 # Lock screen before suspend to RAM
 
-slock sudo "$(which suspend)"
+slock doas "$(which suspend)"
