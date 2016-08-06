@@ -52,7 +52,7 @@ block() {
 
 	# Fill hash tables with networks
 	while read net; do
-		sudo ipset add "${name}""${1}" "${net}"
+		ipset add "${name}""${1}" "${net}"
 	done <<- EOF
 	$(grep -F "${delim}" "${tmpfile}")
 	EOF
