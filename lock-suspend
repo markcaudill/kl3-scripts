@@ -1,4 +1,4 @@
 #!/bin/sh
 # Lock screen before suspend to RAM
 
-slock doas suspend
+lock doas suspend
