@@ -4,6 +4,9 @@
 wpa_cli status \
 	| awk -F= \
 		'/^ssid/ {
-			print ($2 == "") ? "down" : $2
+			ssid = $2
 			exit(0)
+		}
+		END {
+			print (ssid == "") ? "down" : ssid
 		}'
