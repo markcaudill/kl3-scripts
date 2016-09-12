@@ -7,7 +7,7 @@ pkill -SIGSTOP xbattmon\|setdwmstat
 slock ${@}
 pkill -SIGCONT xbattmon\|setdwmstat
 
-if [ -f ~/slock.jpg ]; then
+if [ -f /tmp/slock.jpg ]; then
 	filepath=~/slock-pictures/slock-$(date +%F-%T).jpg
-	mv -f ~/slock.jpg ${filepath} && sxiv -f -q ${filepath}
+	mv -f /tmp/slock.jpg ${filepath} && sxiv -f -q ${filepath}
 fi
