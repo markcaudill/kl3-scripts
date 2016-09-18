@@ -3,6 +3,6 @@
 # options or a command to execute remotely by editing the selection in
 # dmenu(1)
 
-exec ssh $(sed -n -e s/^Host\ //p "${HOME}"/.ssh/config \
-		| sort -s \
+exec ssh $(awk '/^Host/ { print $2 }' "${HOME}"/.ssh/config \
+		| sort -d -b \
 		| dmenu -p Host: -l 10)
