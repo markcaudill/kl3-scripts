@@ -6,8 +6,3 @@ xset dpms force off
 pkill -SIGSTOP xbattmon\|setdwmstat
 slock ${@}
 pkill -SIGCONT xbattmon\|setdwmstat
-
-if [ -f /tmp/slock.jpg ]; then
-	filepath=~/slock-pictures/slock-$(date +%F-%T).jpg
-	mv -f /tmp/slock.jpg ${filepath} && sxiv -f -q ${filepath}
-fi
