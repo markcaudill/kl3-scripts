@@ -5,8 +5,9 @@
 BEGIN {
 	"date +%s" | getline epoch
 	"sysctl -n kern.boottime" | getline boot
-	# Uptime in seconds
+	# Uptime in seconds and days
 	uptime = epoch - boot
+	uptime_d = uptime / 60 / 60 / 24
 
 	"netstat -b -I em0 | head -n2 | tail -n1" | getline
 	# Total in- and outbound traffic on WAN interfaces in bytes
@@ -17,45 +18,47 @@ BEGIN {
 		ibytes,
 		obytes
 	
-	if (uptime >= 1) {
-		# uptime in days
-		uptime_d = uptime / 60 / 60 / 24
-
-		# Traffic in megabytes
-		ibytes_m = ibytes / 1024 / 1024
-		obytes_m = obytes / 1024 / 1024
-
-		printf "Uptime:\t\t%dd\n",
-			uptime_d
-
-		printf "In  per day:\t%dM\nOut per day:\t%dM\n",
-			ibytes_m / uptime_d,
-			obytes_m / uptime_d
-	} else {
-		print "Uptime:\t%dm\n",
+	if (uptime_d < 1) {
+		printf "Uptime:\t%dm\n",
 			uptime / 60 / 60
-
 		exit(0)
 	}
 
-	if (uptime_d >= 7) {
-		ibytes_g = ibytes_m / 1024
-		obytes_g = obytes_m / 1024
+	printf "Uptime:\t\t%dd\n",
+		uptime_d
 
-		printf "In  per week:\t%.1fG\nOut per week:\t%.1fG\n",
-			ibytes_g * 7 / uptime_d,
-			obytes_g * 7 / uptime_d
-	}
+	# Traffic in megabytes
+	ibytes_m = ibytes / 1024 / 1024
+	obytes_m = obytes / 1024 / 1024
 
-	if (uptime_d >= 30) {
-		printf "In  per month:\t%.2fG\nOut per month:\t%.2fG\n",
-			ibytes_g * 30 / uptime_d,
-			obytes_g * 30 / uptime_d
-	}
+	printf "In  per day:\t%dM\nOut per day:\t%dM\n",
+		ibytes_m / uptime_d,
+		obytes_m / uptime_d
 
-	if (uptime_d >= 365) {
-		printf "In  per month:\t%.3fT\nOut per month:\t%.3fT\n",
-			ibytes_g / 1024 * 365 / uptime_d,
-			obytes_g / 1024 * 365 / uptime
-	}
+
+	if (uptime_d < 7)
+		exit(0)
+
+	ibytes_g = ibytes_m / 1024
+	obytes_g = obytes_m / 1024
+
+	printf "In  per week:\t%.1fG\nOut per week:\t%.1fG\n",
+		ibytes_g * 7 / uptime_d,
+		obytes_g * 7 / uptime_d
+
+
+	if (uptime_d < 30)
+		exit(0)
+
+	printf "In  per month:\t%.2fG\nOut per month:\t%.2fG\n",
+		ibytes_g * 30 / uptime_d,
+		obytes_g * 30 / uptime_d
+
+
+	if (uptime_d < 365)
+		exit(0)
+
+	printf "In  per month:\t%.3fT\nOut per month:\t%.3fT\n",
+		ibytes_g / 1024 * 365 / uptime_d,
+		obytes_g / 1024 * 365 / uptime
 }
