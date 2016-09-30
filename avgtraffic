@@ -24,7 +24,7 @@ BEGIN {
 		exit(0)
 	}
 
-	printf "Uptime:\t\t%dd\n",
+	printf "Uptime:\t%dd\n",
 		uptime_d
 
 	# Traffic in megabytes
