@@ -5,9 +5,8 @@
 BEGIN {
 	"date +%s" | getline epoch
 	"sysctl -n kern.boottime" | getline boot
-	# Uptime in seconds and days
-	uptime = epoch - boot
-	uptime_d = uptime / 60 / 60 / 24
+	# Uptime in days
+	uptime_d = (epoch - boot) / 60 / 60 / 24
 
 	"netstat -b -I em0 | head -n2 | tail -n1" | getline
 	# Total in- and outbound traffic on WAN interfaces in bytes
@@ -17,12 +16,10 @@ BEGIN {
 	printf "In  [B]:\t%d\nOut [B]:\t%d\n",
 		ibytes,
 		obytes
+
 	
-	if (uptime_d < 1) {
-		printf "Uptime [m]:\t%d\n",
-			uptime / 60 / 60
+	if (uptime_d < 1)
 		exit(0)
-	}
 
 	printf "Uptime [d]:\t%d\n",
 		uptime_d
