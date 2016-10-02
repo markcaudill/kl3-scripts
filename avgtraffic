@@ -61,5 +61,5 @@ BEGIN {
 
 	printf "In  [TiB/y]:\t%.3f\nOut [TiB/y]:\t%.3f\n",
 		ibytes_g / 1024 * 365 / uptime_d,
-		obytes_g / 1024 * 365 / uptime
+		obytes_g / 1024 * 365 / uptime_d
 }
