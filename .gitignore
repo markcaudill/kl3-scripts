@@ -1,4 +1,5 @@
-/externalpipe
+# Symlink to doas(1)
+/sudo
 # Symlinks to tmuxify
 /calcurse
 /irc
