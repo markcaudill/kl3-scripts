@@ -1,6 +1,6 @@
 #!/bin/sh
 # Attach to existing tmux session or run $PROGRAM inside newly spawned one
-# USAGE:	$ ln -s tmuxify mutt && ./mutt
+# USAGE:	$ ln -s ${HOME}/tmuxify ${HOME}/mutt && mutt
 
 # The program's name
 name="${0##*/}"
@@ -15,7 +15,7 @@ exe=$(which -a "${name}" \
 	&& printf '"%s" not found in $PATH.' "${name}" 1>&2 \
 	&& exit 1
 
-tmux has -t "${name}" \
-	&& exec tmux attach -t "${name}" \
-	|| exec tmux new -n "${name}" -s "${name}" \
+tmux has-session -t "${name}" \
+	&& exec tmux attach-session -t "${name}" \
+	|| exec tmux new-session -n "${name}" -s "${name}" \
 		"${exe}" ${@}
