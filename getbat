@@ -1,8 +1,0 @@
-#!/bin/sh
-# get battery status in [+]percentage [if charging]
-
-dir=/sys/class/power_supply/BAT0
-
-grep -q ^C "${dir}"/status && printf +
-
-cat "${dir}"/capacity

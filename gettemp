@@ -1,5 +1,5 @@
 #!/bin/sh
 # get CPU temperature in celsius
 
-# platform specific
-awk '{ print $2 }' /proc/acpi/ibm/thermal
+sysctl -n hw.sensors.cpu0.temp0 \
+	| cut -d. -f1

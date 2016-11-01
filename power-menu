@@ -9,7 +9,13 @@ case "${selection}" in
 	lock|lock-suspend)
 		${selection}
 		;;
-	poweroff|reboot|suspend)
-		doas ${selection}
+	reboot)
+		doas reboot
+		;;
+	poweroff)
+		doas /sbin/shutdown -p now
+		;;
+	suspend)
+		apm -z
 		;;
 esac

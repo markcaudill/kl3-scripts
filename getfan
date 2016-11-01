@@ -1,8 +1,5 @@
 #!/bin/sh
 # get CPU fan speed in RPM
 
-# platforn specific
-awk '/^speed/ {
-	print $2
-	exit(0)
-}' /proc/acpi/ibm/fan
+sysctl -n hw.sensors.acpithinkpad0.fan0 \
+	| cut -d' ' -f1
