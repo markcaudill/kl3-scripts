@@ -10,7 +10,7 @@ do
 				print substr($0, 0, 40)
 				exit(0)
 			}' "${CMUS_STATUS_FILE}")" \
-		"$(getip | tail -n1)" \
+		"$(getip em | tail -n1)" \
 		"$(getssid)" \
 		$(gettemp) \
 		$(getvol | cut -d. -f1) \

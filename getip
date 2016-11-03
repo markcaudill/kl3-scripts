@@ -1,6 +1,6 @@
 #!/bin/sh
-# get local IP addresses otherwise 'down'
+# get local IP addresses (of given interface only)
 
-# TODO
-
-printf ::1\n
+ifconfig ${1} \
+	| grep -F inet \
+	| cut -d' ' -f2
