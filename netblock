@@ -1,36 +1,37 @@
 #!/bin/sh
-# Block entire network services (provider)
+# Load IPv4 and IPv6 networks (one per line) into memory in order to
+# block to and/or from them
+#	## Example pf.conf(5)
+#	table <netblock> persist
+#	block return out quick to   <netblock>
+#	block drop   in  quick from <netblock>
+#
+#	## Example doas.conf(5) entry
+#	permit	nopass	kle \
+#		cmd /sbin/pfctl	args -t netblock -T replace -f-
+#
+#	## Example crontab(5)
+#	# Fill table every thursday at 8pm
+#	0 20 * * * netblock
 
-[ $(id -u) -ne 0 ] \
-	&& printf 'This script must be run as root.\n' \
-	&& exit 1
+# Services to block
+as='20940, # Akamai
+    32787, # Akamai (other)
+    714,   # Apple
+    19679, # Dropbox
+    32934, # Facebook
+    15169, # Google
+    8075,  # Microsoft
+    2906,  # Netflix
+    8403,  # Spotify
+    32590, # Valve
+    8302   # Zattoo'
 
-# List of services to block
-as_list='
-20940	# Akamai
-32787	# Akamai (other)
-714	# Apple
-19679	# Dropbox
-32934	# Facebook
-15169	# Google
-8075	# Microsoft
-2906	# Netflix
-8403	# Spotify
-32590	# Valve
-8302	# Zattoo
-'
 api_url='https://stat.ripe.net/data/announced-prefixes/data.json?min_peers_seeing=0&resource='
 
-name=${0##*/}
+# TODO: Check network connectivity to ensure table won't be emptied
 
-# Securely write parsed JSON data to temporary file
-umask 0177
-tmpfile=/tmp/"${name}"-$(od -An -N4 -tx4 /dev/random | tr -d ' ')
-trap "rm -f \"${tmpfile}\"" 0 1 2 3 15
-
-curl -s $(printf '%s' "${as_list}" \
-		| awk 'NR > 1 { print "'"${api_url}"'"$1 }' ) \
-	| awk -F\" '/\// { print $4 }' \
-	> "${tmpfile}"
-
-# TODO
+curl -sS "${api_url}"{$(printf '%s' "${as}" | tr -dc [:digit:],)} \
+	| grep -Fw prefix \
+	| cut -d\" -f4 \
+	| doas /sbin/pfctl -t netblock -T replace -f-
