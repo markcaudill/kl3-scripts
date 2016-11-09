@@ -1,6 +1,6 @@
 #!/bin/sh
 # get local IP addresses (of given interface only)
 
-ifconfig ${1} \
+ifconfig ${1:-egress} \
 	| grep -F inet \
 	| cut -d' ' -f2
