@@ -5,11 +5,9 @@
 while (true)
 do
 	xsetroot -name "$(printf '%.40s  E: %s  W: %s  %.2d°C  %d%%  %.18s' \
-		"$(awk '/^playing$/ {
-				getline
-				print substr($0, 0, 40)
-				exit(0)
-			}' "${CMUS_STATUS_FILE}")" \
+		"$(grep -A1 -Fx playing "${CMUS_STATUS_FILE}" \
+			| tail -n1 \
+			| cut -c1-40)" \
 		"$(getip em | tail -n1)" \
 		"$(getssid)" \
 		$(gettemp) \
