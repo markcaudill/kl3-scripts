@@ -3,4 +3,5 @@
 
 ifconfig ${1:-egress} \
 	| grep -F inet \
+	| grep -vF ' fe80' \
 	| cut -d' ' -f2
