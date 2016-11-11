@@ -2,8 +2,7 @@
 # get the wifi network's SSID otherwise 'down'
 
 ifconfig wlan \
-	| awk \
-		'/status: active/ {
+	| awk '/status: active/ {
 			getline
 			print ($3 == "") ? "down" : $3
 		}'
