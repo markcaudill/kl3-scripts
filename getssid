@@ -1,8 +1,7 @@
 #!/bin/sh
-# get the wifi network's SSID otherwise 'down'
+# get currently set wifi SSID
 
 ifconfig wlan \
-	| awk '/status: active/ {
-			getline
-			print ($3 == "") ? "down" : $3
-		}'
+	| grep -FA1 'status: active' \
+	| tail -n1 \
+	| cut -d' ' -f3

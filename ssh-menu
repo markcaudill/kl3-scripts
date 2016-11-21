@@ -3,6 +3,7 @@
 # options or a command to execute remotely by editing the selection in
 # dmenu(1)
 
-exec ssh $(awk '/^Host/ { print $2 }' "${HOME}"/.ssh/config \
-		| sort -d -b \
+exec ssh $(grep ^Host "${HOME}"/.ssh/config \
+		| cut -d' ' -f2 \
+		| sort -df \
 		| dmenu -p Host: -l 20)
