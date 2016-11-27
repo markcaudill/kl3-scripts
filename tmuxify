@@ -4,18 +4,24 @@
 
 # The program's name
 name="${0##*/}"
-# This script's absoloute directory
-path=$(readlink "${0}")
-# First binary found in $PATH not being this script itself
-exe=$(which -a "${name}" \
-		| grep -v -E "^(${path%/*}|$(cd "${0%/*}" && pwd))" \
-		| head -n1)
+# This script's absoloute path
+path="$(readlink "${0}")"
+# Next binary in $PATH
+exe="$(which -a "${name}" \
+		| grep -vE "^(${path%/*}|$(cd "${0%/*}" && pwd))" \
+		| head -n1)"
 
 [ -z "${exe}" ] \
 	&& printf '"%s" not found in $PATH.' "${name}" 1>&2 \
 	&& exit 1
 
-tmux has-session -t "${name}" \
-	&& exec tmux attach-session -t "${name}" \
-	|| exec tmux new-session -n "${name}" -s "${name}" \
+# Open terminal if neccessary
+[ ! -t 0 ] && [ -n "${DISPLAY}" ] \
+	&& term='st -e'
+
+if tmux has-session -t "${name}"; then
+	exec ${term:-} tmux attach-session -t "${name}"
+else
+	exec ${term:-} tmux new-session -n "${name}" -s "${name}" \
 		"${exe}" ${@}
+fi
