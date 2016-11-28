@@ -15,17 +15,18 @@
 #	0 20 * * * netblock
 
 # Services to block
-as='20940, # Akamai
-    32787, # Akamai (other)
-    714,   # Apple
-    19679, # Dropbox
-    32934, # Facebook
-    15169, # Google
-    8075,  # Microsoft
+as='714,   # Apple
     2906,  # Netflix
+    8075,  # Microsoft
+    8302,  # Zattoo
     8403,  # Spotify
+    15169, # Google
+    19679, # Dropbox
+    20940, # Akamai
     32590, # Valve
-    8302   # Zattoo'
+    32787, # Akamai (other)
+    32934, # Facebook
+    54113  # Disqus'
 
 api_url='https://stat.ripe.net/data/announced-prefixes/data.json?min_peers_seeing=0&resource='
 
