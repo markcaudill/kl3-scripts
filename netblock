@@ -15,24 +15,28 @@
 #	0 20 * * * netblock
 
 # Services to block
-as='714,   # Apple
-    2906,  # Netflix
-    8075,  # Microsoft
-    8302,  # Zattoo
-    8403,  # Spotify
-    15169, # Google
-    19679, # Dropbox
-    20940, # Akamai
-    32590, # Valve
-    32787, # Akamai (other)
-    32934, # Facebook
-    54113  # Disqus'
+as='714    Apple
+    2906   Netflix
+    8075   Microsoft
+    8302   Zattoo
+    8403   Spotify
+    15169  Google
+    19679  Dropbox
+    20940  Akamai
+    32590  Valve
+    32787  Akamai (other)
+    32934  Facebook
+    54113  Disqus'
 
 api_url='https://stat.ripe.net/data/announced-prefixes/data.json?min_peers_seeing=0&resource='
 
 # TODO: Check network connectivity to ensure table won't be emptied
 
-curl -sS "${api_url}"{$(printf '%s' "${as}" | tr -dc [:digit:],)} \
+# Brace expansion done by curl(1) not the shell
+curl -sS --compressed \
+		"${api_url}"{$(printf '%s' "${as}" \
+					| tr -dc [:digit:]\\n \
+					| paste -sd, -)} \
 	| grep -Fw prefix \
 	| cut -d\" -f4 \
 	| doas /sbin/pfctl -t netblock -T replace -f-
