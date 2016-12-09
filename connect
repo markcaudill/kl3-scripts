@@ -1,0 +1,45 @@
+#!/bin/sh
+# Connect to IRC client at home appropiately depending on currently
+# used network
+
+mac_vether=12:7c:64:b8:9a:53
+#mac_em1=00:0d:b9:42:91:35
+
+mosh_ports=60022:60023
+# Enable UTF-8, detach other clients
+remote_cmd='tmux -u attach-session -d -t irc'
+
+# Test without DNS, timeout after 10s
+nc='nc -nzw10'
+
+# TODO: No ARPv6 !
+if arp -a | head -n2 | tr -s ' ' | grep -Fq "barricade ${mac_vether}"
+then
+	printf home\\n
+	exec mosh -p "${mosh_ports}" -- barricade \
+			${remote_cmd}
+else
+	printf 'mobile: IP is...'
+	ip="$(ssh barricade-tor curl -sS https://ifcfg.me/ip)"
+	printf '\b\b\b %s\\n' "${ip:?Could not get public IP}"
+	
+	printf 'Connecting with...'
+	if ${nc} -u "${ip}" "${mosh_ports}"
+	then
+		printf '\b\b\b Mosh\n'
+		exec mosh -p "${mosh_ports}" \
+			--ssh='ssh -t -oStrictHostKeyChecking=no' \
+			-- "${USER}"@"${ip}" ${remote_cmd}
+	else
+		printf '\b\b\b SSH...'
+		if ${nc} "${ip}" 22
+		then
+			printf '\b\b\b\n'
+			exec ssh -t barricade ${remote_cmd}
+		else
+			printf '\b\b\b over Tor\n'
+			exec ssh -t -ostrictHostKeyChecking=no \
+				barricade-tor ${remote_cmd}
+		fi
+	fi
+fi
