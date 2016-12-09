@@ -1,26 +1,30 @@
 #!/bin/sh
-# Connect to IRC client at home appropiately depending on currently
-# used network
+# Connect to remote ${host} appropiately depending on current
+# network status and execute given command
+# Hosts defined in ssh_config(5) are used, thus only the Hostname
+# as well as optional ports fort mosh(1) are to be passed through
+# the environment
+# The remote command is to be specified as argument
+#
+# Usage:	$ env HOST=foo MOSH_PORTS=61234 \
+#			connect tmux a -t <session-name>
 
-mac_vether=12:7c:64:b8:9a:53
-#mac_em1=00:0d:b9:42:91:35
+host="${HOST:?Hostname must not be empty}"
+remote_cmd="${@:?Remote command must not be empty}"
 
-mosh_ports=60022:60023
-# Enable UTF-8, detach other clients
-remote_cmd='tmux -u attach-session -d -t irc'
+mosh_ports="${MOSH_PORTS:-60000:61000}"
 
 # Test without DNS, timeout after 10s
 nc='nc -nzw10'
 
-# TODO: No ARPv6 !
-if arp -a | head -n2 | tr -s ' ' | grep -Fq "barricade ${mac_vether}"
+# TODO:	Handle IPv6
+if arp -a | head -n2 | tr -s ' ' | grep -Fq "${host} ${MAC:?}"
 then
 	printf home\\n
-	exec mosh -p "${mosh_ports}" -- barricade \
-			${remote_cmd}
+	exec mosh -p "${mosh_ports}" -- "${host}" ${remote_cmd}
 else
 	printf 'mobile: IP is...'
-	ip="$(ssh barricade-tor curl -sS https://ifcfg.me/ip)"
+	ip="$(ssh "${host}"-tor curl -sS https://ifcfg.me/ip)"
 	printf '\b\b\b %s\\n' "${ip:?Could not get public IP}"
 	
 	printf 'Connecting with...'
@@ -35,11 +39,11 @@ else
 		if ${nc} "${ip}" 22
 		then
 			printf '\b\b\b\n'
-			exec ssh -t barricade ${remote_cmd}
+			exec ssh -t "${host}" ${remote_cmd}
 		else
 			printf '\b\b\b over Tor\n'
 			exec ssh -t -ostrictHostKeyChecking=no \
-				barricade-tor ${remote_cmd}
+				"${host}"-tor ${remote_cmd}
 		fi
 	fi
 fi
