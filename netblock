@@ -8,7 +8,7 @@
 #
 #	## Example doas.conf(5) entry
 #	permit	nopass	kle \
-#		cmd /sbin/pfctl	args -t netblock -T replace -f-
+#		cmd /sbin/pfctl	args -Treplace -tnetblock -f-
 #
 #	## Example crontab(5)
 #	# Fill table every thursday at 8pm
@@ -32,11 +32,10 @@ api_url='https://stat.ripe.net/data/announced-prefixes/data.json?min_peers_seein
 
 # TODO: Check network connectivity to ensure table won't be emptied
 
-# Brace expansion done by curl(1) not the shell
-curl -sS --compressed \
-		"${api_url}"{$(printf '%s' "${as}" \
-					| tr -dc [:digit:]\\n \
-					| paste -sd, -)} \
+# Brace expansion done by curl(1) not sh(1)
+curl -sS --compressed "${api_url}{$(printf %s "${as}" \
+					| tr -dc '[:digit:]\n' \
+					| paste -sd, -)}" \
 	| grep -Fw prefix \
 	| cut -d\" -f4 \
-	| doas /sbin/pfctl -t netblock -T replace -f-
+	| doas /sbin/pfctl -Treplace -tnetblock -f-
