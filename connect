@@ -15,35 +15,38 @@ remote_cmd="${@:?Remote command must not be empty}"
 mosh_ports="${MOSH_PORTS:-60000:61000}"
 
 # Test without DNS, timeout after 10s
-nc='nc -nzw10'
+nc='nc -dnzw10'
 
 # TODO:	Handle IPv6
 if arp -a | head -n2 | tr -s ' ' | grep -Fq "${host} ${MAC:?}"
 then
-	printf home\\n
+	printf home\\n 1>&2
 	exec mosh -p "${mosh_ports}" -- "${host}" ${remote_cmd}
-else
-	printf 'mobile: IP is...'
-	ip="$(ssh "${host}"-tor curl -sS https://ifcfg.me/ip)"
-	printf '\b\b\b %s\\n' "${ip:?Could not get public IP}"
-	
-	printf 'Connecting with...'
-	if ${nc} -u "${ip}" "${mosh_ports}"
+fi
+
+printf 'mobile: IP is...' 1>&2
+ip="$(ssh "${host}"-tor curl -sS https://ifcfg.me/ip)"
+printf '\b\b\b %s\n' "${ip:?Could not get public IP}" 1>&2
+
+printf 'Connecting with...' 1>&2
+for p in $(printf %s "${mosh_ports}" | tr : ' ')
+do
+	if ${nc} -u "${ip}" ${p} 2>/dev/null
 	then
-		printf '\b\b\b Mosh\n'
+		printf '\b\b\b Mosh\n' 1>&2
 		exec mosh -p "${mosh_ports}" \
-			--ssh='ssh -t -oStrictHostKeyChecking=no' \
+			--ssh='ssh -oStrictHostKeyChecking=no' \
 			-- "${USER}"@"${ip}" ${remote_cmd}
-	else
-		printf '\b\b\b SSH...'
-		if ${nc} "${ip}" 22
-		then
-			printf '\b\b\b\n'
-			exec ssh -t "${host}" ${remote_cmd}
-		else
-			printf '\b\b\b over Tor\n'
-			exec ssh -t -ostrictHostKeyChecking=no \
-				"${host}"-tor ${remote_cmd}
-		fi
 	fi
+done
+
+printf '\b\b\b SSH...' 1>&2
+if ${nc} "${ip}" 22
+then
+	printf '\b\b\b\n' 1>&2
+	exec ssh -t "${host}" ${remote_cmd}
+else
+	printf '\b\b\b over Tor\n' 1>&2
+	exec ssh -qt -ostrictHostKeyChecking=no \
+		"${host}"-tor ${remote_cmd}
 fi
