@@ -10,7 +10,8 @@ case "${selection}" in
 		${selection}
 		;;
 	reboot)
-		doas reboot
+		doas /sbin/reboot
+
 		;;
 	poweroff)
 		doas /sbin/shutdown -p now
