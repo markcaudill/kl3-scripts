@@ -12,6 +12,7 @@
 host="${HOST:?Hostname must not be empty}"
 remote_cmd="${@:?Remote command must not be empty}"
 
+# See mosh(1)
 mosh_ports="${MOSH_PORTS:-60000:61000}"
 
 # Test without DNS, timeout after 10s

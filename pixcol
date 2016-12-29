@@ -3,5 +3,5 @@
 
 eval $(xdotool getmouselocation --shell)
 
-import -window ${WINDOW} png:- \
+import -window "${WINDOW}" png:- \
 	| convert png:- -format "%[pixel:p{${X},${Y}}]\n" info:-
