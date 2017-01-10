@@ -1,8 +1,6 @@
-# Symlink to doas(1)
-/sudo
 # Symlinks to tmuxify
-/calcurse
 /cmus
 /irc
 /mutt
 /snownews
+/w3m
