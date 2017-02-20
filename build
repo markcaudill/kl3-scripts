@@ -1,0 +1,51 @@
+#!/bin/sh
+# Build OpenBSD kernel and/or base from source, see release(8)
+
+set -eu
+
+NPROC=$(sysctl -n hw.ncpufound)
+
+[ $(id -u) -eq 0 ]
+
+ask() {
+	printf '%s? [yN]: ' "${1}"
+	read
+	[ "${REPLY}" = y ] || return 1
+	return 0
+}
+
+build_base() {
+	prepare_obj
+	make -j${NPROC} -C/usr/src obj build
+	if ask 'run sysmerge'; then
+		ask '  diff mode' && sysmerge -d || sysmerge
+	fi
+}
+
+build_kernel() {
+	local DIR=/sys/arch/$(machine)/compile/GENERIC
+	prepare_obj
+	make -C${DIR} obj config
+	make -sj${NPROC} -C${DIR}
+	ask 'install kernel' && install_kernel
+}
+
+install_kernel() {
+	mount -v | grep -q '/usr .+read-only'
+	local RO=${?}
+	[ ${RO} -eq 0 ] && mount -uw /usr
+	set +e	# Avoid existing before /usr is reset again
+	make install
+	[ ${RO} -eq 0 ] && mount -ur /usr
+}
+
+prepare_obj() {
+	mount -s /usr/obj
+	chown build:wobj /usr/obj
+	chmod 770 /usr/obj
+}
+
+ask 'build kernel' && build_kernel
+ask 'build base' && build_base
+
+return 0
