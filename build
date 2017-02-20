@@ -16,7 +16,8 @@ ask() {
 
 build_base() {
 	prepare_obj
-	make -j${NPROC} -C/usr/src obj build
+	make -C/usr/src -sj${NPROC} obj 1>/dev/null
+	make -C/usr/src -sj${NPROC} build
 	if ask 'run sysmerge'; then
 		ask '  diff mode' && sysmerge -d || sysmerge
 	fi
@@ -25,18 +26,9 @@ build_base() {
 build_kernel() {
 	local DIR=/sys/arch/$(machine)/compile/GENERIC
 	prepare_obj
-	make -C${DIR} obj config
-	make -sj${NPROC} -C${DIR}
-	ask 'install kernel' && install_kernel
-}
-
-install_kernel() {
-	mount -v | grep -q '/usr .+read-only'
-	local RO=${?}
-	[ ${RO} -eq 0 ] && mount -uw /usr
-	set +e	# Avoid existing before /usr is reset again
-	make install
-	[ ${RO} -eq 0 ] && mount -ur /usr
+	make -C"${DIR}" obj config
+	make -C"${DIR}" -sj${NPROC}
+	ask 'install kernel' && make -C"${DIR}" install
 }
 
 prepare_obj() {
