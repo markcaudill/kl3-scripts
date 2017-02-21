@@ -3,19 +3,19 @@
 
 set -eu
 
-NPROC=$(sysctl -n hw.ncpufound)
-
 [ $(id -u) -eq 0 ]
+
+NPROC=$(sysctl -n hw.ncpufound)
 
 ask() {
 	printf '%s? [yN]: ' "${1}"
-	read
+	read REPLY
 	[ "${REPLY}" = y ] || return 1
 	return 0
 }
 
 build_base() {
-	prepare_obj
+	mount -s /usr/obj
 	make -C/usr/src -sj${NPROC} obj 1>/dev/null
 	make -C/usr/src -sj${NPROC} build
 	if ask 'run sysmerge'; then
@@ -24,17 +24,11 @@ build_base() {
 }
 
 build_kernel() {
-	local DIR=/sys/arch/$(machine)/compile/GENERIC
-	prepare_obj
+	mount -s /usr/obj
+	DIR=/sys/arch/$(machine)/compile/GENERIC
 	make -C"${DIR}" obj config
 	make -C"${DIR}" -sj${NPROC}
 	ask 'install kernel' && make -C"${DIR}" install
-}
-
-prepare_obj() {
-	mount -s /usr/obj
-	chown build:wobj /usr/obj
-	chmod 770 /usr/obj
 }
 
 ask 'build kernel' && build_kernel
