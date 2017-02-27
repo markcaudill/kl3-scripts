@@ -1,10 +1,10 @@
 #!/bin/sh
 # Connect to remote ${host} through ssh(1) or mosh(1) depending on the
 # current network connectivity and execute given command.
-# Hosts defined in ssh_config(5) are used, thus only the ${host}, ${MAC} and
-# optional ${*_ports} must be provided through the environment.
+# Hosts defined in ssh_config(5) are used, thus only the ${host} and
+# optional ${mosh_ports} must be provided through the environment.
 #
-# Usage:	$ env HOST=foo MOSH_PORTS=61000:62000 SSH_PORT=2222 connect \
+# Usage:	$ env HOST=foo MOSH_PORTS=61000:62000 connect \
 #			tmux a -t <session-name>
 # Example ssh_config(5) for ${host}-tor, see nc(1) for more information
 #
@@ -14,11 +14,7 @@
 
 host="${HOST:?hostname must not be empty}"
 remote_cmd="${@:?remote command must not be empty}"
-
 mosh_ports="${MOSH_PORTS:-60000:61000}"
-ssh_port="${SSH_PORT:-22}"
-
-typeset -ft
 
 _ip() {
 	printf 'GET /ip HTTP/1.0\r\n\r\n' |
@@ -28,38 +24,36 @@ _ip() {
 }
 
 _mosh() {
-	mosh ${1} --ssh="ssh -p${ssh_port} -oConnectTimeout=5" -- \
+	set -x
+	mosh ${1} --ssh='ssh -oConnectTimeout=5' -- \
 	     "${2:-${host}}" ${remote_cmd}
 }
 
 _ssh() {
+	set -x
 	ssh -t -oConnectTimeout=5 ${1} -- \
 	    "${2:-${host}}" ${remote_cmd}
 }
 
-printf 'trying mosh on lan...'
+printf 'LAN: ...' 1>&2
 {
 ping6 -c2 -qnw1 "${host}" ||
 ping  -c2 -qnw1 "${host}"
 } 2>/dev/null 1>&2
 
 [ ${?} -eq 0 ] &&
-	printf home\\n &&
-	_mosh
+	_mosh ||
+	printf failed\\n 1>&2
 
-printf 'failed\nmobile: IP is...'
+printf 'WAN: IP: ...' 1>&2
 ip="$(_ip)"
-printf '\b\b\b %s\n' "${ip:?Could not get public IP}"
+printf '\b\b\b%s\n' "${ip:?Could not get public IP}"
 
-printf 'trying mosh...'
-_mosh "-p ${mosh_ports} --ssh=ssh\ -oStrictHostKeyChecking=no" \
-      "${USER}"@"${ip}" ||
-	printf ' failed\n'
+_mosh "-p ${mosh_ports}" "${USER}"@"${ip}" ||
+	printf failed\\n 1>&2
 
-printf 'trying ssh...'
-_ssh -p"${ssh_port}" ||
-	printf ' failed\n'
+_ssh ||
+	printf failed\\n 1>&2
 
-printf 'trying ssh through tor...'
-_ssh "-q -p${ssh_port} -oStrictHostKeyChecking=no" "${host}"-tor ||
-	printf ' failed\n'
+_ssh '-q -oStrictHostKeyChecking=no' "${host}"-tor ||
+	printf failed\\n 1>&2
