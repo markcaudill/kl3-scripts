@@ -20,8 +20,15 @@ ssh_port="${SSH_PORT:-22}"
 
 typeset -ft
 
+_ip() {
+	printf 'GET /ip HTTP/1.0\r\n\r\n' |
+		ssh -T -oConnectTimeout=5 -- \
+		    "${host}"-tor nc -cw5 ifcfg.me 443 |
+		tail -n1
+}
+
 _mosh() {
-	mosh ${1} --ssh="ssh -oConnectTimeout=5" -- \
+	mosh ${1} --ssh="ssh -p${ssh_port} -oConnectTimeout=5" -- \
 	     "${2:-${host}}" ${remote_cmd}
 }
 
@@ -41,7 +48,7 @@ ping  -c2 -qnw1 "${host}"
 	_mosh
 
 printf 'failed\nmobile: IP is...'
-ip="$(ssh -T -oConnectTimeout=5 -- "${host}"-tor curl -sS https://ifcfg.me/ip)"
+ip="$(_ip)"
 printf '\b\b\b %s\n' "${ip:?Could not get public IP}"
 
 printf 'trying mosh...'
