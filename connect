@@ -3,55 +3,56 @@
 # current network connectivity and execute given command.
 # Hosts defined in ssh_config(5) are used, thus only the ${host}, ${MAC} and
 # optional ${*_ports} must be provided through the environment.
-# ${MAC} defines the hardware address to look for on the local network
-# to decide whether the connaction is made within LAN or not.
 #
-# Usage:	$ env HOST=foo MAC=01:02:03:04:05:06 \
-#		      MOSH_PORTS=61234 SSH_PORT=2222 \
-#			connect tmux a -t <session-name>
+# Usage:	$ env HOST=foo MOSH_PORTS=61000:62000 SSH_PORT=2222 connect \
+#			tmux a -t <session-name>
+# Example ssh_config(5) for ${host}-tor, see nc(1) for more information
 #
-# TODO: Get rid of ${MAC}
+# Host foo-tor
+#	Hostname	0xdeadbeef123456.onion
+#	ProxyCommand	nc -6w5 -nX5 -x[::1]:9050 %h %p
 
-host="${HOST:?Hostname must not be empty}"
-remote_cmd="${@:?Remote command must not be empty}"
+host="${HOST:?hostname must not be empty}"
+remote_cmd="${@:?remote command must not be empty}"
 
-# See mosh(1)
 mosh_ports="${MOSH_PORTS:-60000:61000}"
-ssh_port=${SSH_PORT:-22}
+ssh_port="${SSH_PORT:-22}"
 
-# Port knocking, timeout after 10s
-nc='nc -dzw10'
+typeset -ft
 
-# TODO:	Handle IPv6
-if arp -a | head -n2 | tr -s ' ' | grep -Fq "${host} ${MAC:?MAC must not be empty}"
-then
-	printf home\\n 1>&2
-	exec ssh -tp"${ssh_port}" "${host}" ${remote_cmd}
-fi
+_mosh() {
+	mosh ${1} --ssh="ssh -oConnectTimeout=5" -- \
+	     "${2:-${host}}" ${remote_cmd}
+}
 
-printf 'mobile: IP is...' 1>&2
-ip="$(ssh "${host}"-tor curl -sS https://ifcfg.me/ip)"
-printf '\b\b\b %s\nConnecting with...' \
-	"${ip:?Could not get public IP}" 1>&2
+_ssh() {
+	ssh -t -oConnectTimeout=5 ${1} -- \
+	    "${2:-${host}}" ${remote_cmd}
+}
 
-for p in $(printf %s "${mosh_ports}" | tr : ' ')
-do
-	if ${nc} -u "${ip}" ${p} 2>/dev/null
-	then
-		printf '\b\b\b Mosh\n' 1>&2
-		exec mosh -p "${mosh_ports}" \
-			--ssh='ssh -oStrictHostKeyChecking=no' \
-			-- "${USER}"@"${ip}" ${remote_cmd}
-	fi
-done
+printf 'trying mosh on lan...'
+{
+ping6 -c2 -qnw1 "${host}" ||
+ping  -c2 -qnw1 "${host}"
+} 2>/dev/null 1>&2
 
-printf '\b\b\b SSH...' 1>&2
-if ${nc} "${ip}" "${ssh_port}"
-then
-	printf '\b\b\b\n' 1>&2
-	exec ssh -tp"${ssh_port}" "${host}" ${remote_cmd}
-else
-	printf '\b\b\b over Tor\n' 1>&2
-	exec ssh -qtp"${ssh_port}" -ostrictHostKeyChecking=no \
-		"${host}"-tor ${remote_cmd}
-fi
+[ ${?} -eq 0 ] &&
+	printf home\\n &&
+	_mosh
+
+printf 'failed\nmobile: IP is...'
+ip="$(ssh -T -oConnectTimeout=5 -- "${host}"-tor curl -sS https://ifcfg.me/ip)"
+printf '\b\b\b %s\n' "${ip:?Could not get public IP}"
+
+printf 'trying mosh...'
+_mosh "-p ${mosh_ports} --ssh=ssh\ -oStrictHostKeyChecking=no" \
+      "${USER}"@"${ip}" ||
+	printf ' failed\n'
+
+printf 'trying ssh...'
+_ssh -p"${ssh_port}" ||
+	printf ' failed\n'
+
+printf 'trying ssh through tor...'
+_ssh "-q -p${ssh_port} -oStrictHostKeyChecking=no" "${host}"-tor ||
+	printf ' failed\n'
