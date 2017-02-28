@@ -1,5 +1,5 @@
 #!/bin/sh
-# Build OpenBSD kernel and/or base from source, see release(8)
+# Build OpenBSD from source according to release(8)
 
 set -eu
 
@@ -13,20 +13,27 @@ ask() {
 }
 
 build_base() {
-	mount -s /usr/obj
-	make -C/usr/src obj 1>/dev/null
-	make -C/usr/src build
+	DIR=/usr/src
+	(
+	    set -x
+	    mount -s /usr/obj
+	    make -C"${DIR}" obj
+	    make -C"${DIR}" build
+	) 1>/dev/null
 	if ask 'run sysmerge'; then
 		ask '  diff mode' && sysmerge -d || sysmerge
 	fi
 }
 
 build_kernel() {
-	mount -s /usr/obj
 	DIR=/sys/arch/$(machine)/compile/GENERIC.MP
-	make -C"${DIR}" obj
-	make -C"${DIR}" config
-	make -C"${DIR}"
+	(
+	    set -x
+	    mount -s /usr/obj
+	    make -C"${DIR}" obj
+	    make -C"${DIR}" config
+	    make -C"${DIR}"
+	) 1>/dev/null
 	ask 'install kernel' && make -C"${DIR}" install
 }
 
