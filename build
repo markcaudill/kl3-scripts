@@ -5,8 +5,6 @@ set -eu
 
 [ $(id -u) -eq 0 ]
 
-NPROC=$(sysctl -n hw.ncpufound)
-
 ask() {
 	printf '%s? [yN]: ' "${1}"
 	read REPLY
@@ -16,8 +14,8 @@ ask() {
 
 build_base() {
 	mount -s /usr/obj
-	make -C/usr/src -sj${NPROC} obj 1>/dev/null
-	make -C/usr/src -sj${NPROC} build
+	make -C/usr/src obj 1>/dev/null
+	make -C/usr/src build
 	if ask 'run sysmerge'; then
 		ask '  diff mode' && sysmerge -d || sysmerge
 	fi
@@ -25,9 +23,10 @@ build_base() {
 
 build_kernel() {
 	mount -s /usr/obj
-	DIR=/sys/arch/$(machine)/compile/GENERIC
-	make -C"${DIR}" obj config
-	make -C"${DIR}" -sj${NPROC}
+	DIR=/sys/arch/$(machine)/compile/GENERIC.MP
+	make -C"${DIR}" obj
+	make -C"${DIR}" config
+	make -C"${DIR}"
 	ask 'install kernel' && make -C"${DIR}" install
 }
 
