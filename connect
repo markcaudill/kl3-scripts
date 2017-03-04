@@ -10,7 +10,7 @@
 #
 # Host foo-tor
 #	Hostname	0xdeadbeef123456.onion
-#	ProxyCommand	nc -6w5 -nX5 -x[::1]:9050 %h %p
+#	ProxyCommand	nc -6 -nX5 -x[::1]:9050 %h %p
 
 host="${HOST:?hostname must not be empty}"
 mosh_ports="${MOSH_PORTS:-60000:61000}"
