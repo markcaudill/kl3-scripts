@@ -18,10 +18,14 @@ build_base() {
 	    set -x
 	    mount -s /usr/obj
 	    make -C"${DIR}" obj
-	    make -C"${DIR}" build
+	    time make -C"${DIR}" build
 	) 1>/dev/null
 	if ask 'run sysmerge'; then
-		ask '  diff mode' && sysmerge -d || sysmerge
+		if ask '  diff mode'; then
+			sysmerge -d
+		else
+			sysmerge
+		fi
 	fi
 }
 
@@ -32,7 +36,7 @@ build_kernel() {
 	    mount -s /usr/obj
 	    make -C"${DIR}" obj
 	    make -C"${DIR}" config
-	    make -C"${DIR}"
+	    time make -C"${DIR}"
 	) 1>/dev/null
 	ask 'install kernel' && make -C"${DIR}" install
 }
