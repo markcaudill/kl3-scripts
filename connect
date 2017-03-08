@@ -26,20 +26,21 @@ _ip() {
 
 _mosh() {
 	set -x
-	mosh ${1} --ssh="ssh -oConnectTimeout=5 ${ssh_opts}" -- \
-	     "${2:-${host}}" ${remote_cmd}
+	mosh ${1} \
+	     --ssh="ssh -oConnectTimeout=5 ${NO_CHECK:+${ssh_opts}}" \
+	     -- "${2:-${host}}" ${remote_cmd}
 }
 
 _ssh() {
 	set -x
-	ssh -t -oConnectTimeout=5 ${ssh_opts} ${1} -- \
-	    "${2:-${host}}" ${remote_cmd}
+	ssh -t -oConnectTimeout=5 ${NO_CHECK:+${ssh_opts}} ${1} \
+	    -- "${2:-${host}}" ${remote_cmd}
 }
 
 printf 'LAN: ...' 1>&2
 {
-ping6 -c2 -qnw1 "${host}" ||
-ping  -c2 -qnw1 "${host}"
+	ping6 -c2 -qnw1 "${host}" ||
+	ping  -c2 -qnw1 "${host}"
 } 2>/dev/null 1>&2
 
 [ ${?} -eq 0 ] &&
@@ -49,6 +50,8 @@ ping  -c2 -qnw1 "${host}"
 printf 'WAN: IP: ...' 1>&2
 ip="$(_ip)"
 printf '\b\b\b%s\n' "${ip:?Could not get public IP}"
+
+NO_CHECK=1
 
 _mosh "-p ${mosh_ports}" "${USER}"@"${ip}" ||
 	printf failed\\n 1>&2
