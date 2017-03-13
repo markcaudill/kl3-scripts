@@ -11,15 +11,15 @@ ask() {
 	[ "${REPLY}" = y ]
 }
 
+build() {
+	set -x
+	mount -s /usr/${X:-}obj
+	time make -C"${DIR}" ${@:-} 1>/dev/null
+}
+
 build_base() {
 	DIR=/usr/src
-	time (
-		set -x
-		mount -s /usr/obj
-		cd "${DIR}"
-		make obj
-		make build
-	) 1>/dev/null
+	build obj build
 	if ask 'run sysmerge'; then
 		if ask '  diff mode'; then
 			sysmerge -d
@@ -31,27 +31,14 @@ build_base() {
 
 build_kernel() {
 	DIR=/sys/arch/"$(machine)"/compile/GENERIC.MP
-	time (
-		set -x
-		mount -s /usr/obj
-		cd "${DIR}"
-		make obj
-		make config
-		make
-	) 1>/dev/null
+	build obj config
+	build
 	ask 'install kernel' && make -C"${DIR}" install
 }
 
 build_xenocara() {
 	DIR=/usr/xenocara
-	time (
-		set -x
-		mount -s /usr/xobj
-		cd "${DIR}"
-		make bootstrap
-		make obj
-		make build
-	) 1>/dev/null
+	X=x build bootstrap obj build
 }
 
 ask 'build kernel'   && build_kernel
