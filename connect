@@ -3,6 +3,8 @@
 # current network connectivity and execute given command.
 # Hosts defined in ssh_config(5) are used, thus only the ${host} and
 # optional ${mosh_ports} must be provided through the environment.
+# IPv6 is always preferred over IPv4 unless ssh_config(5) overwrites
+# this behaviour.
 #
 # Usage:	$ env HOST=foo MOSH_PORTS=61000:62000 connect \
 #			tmux a -t <session-name>
@@ -10,54 +12,51 @@
 #
 # Host foo-tor
 #	Hostname	0xdeadbeef123456.onion
-#	ProxyCommand	nc -6 -nX5 -x[::1]:9050 %h %p
+#	ProxyCommand	nc -6nX5 -x[::1]:9050 %h %p
 
 host="${HOST:?hostname must not be empty}"
 mosh_ports="${MOSH_PORTS:-60000:61000}"
 remote_cmd="${@:?remote command must not be empty}"
 ssh_opts='-oStrictHostKeyChecking=no -oUserKnownHostsFile=/dev/null'
 
-_ip() {
+ip() {
 	printf 'GET /ip HTTP/1.0\r\n\r\n' |
-		ssh -T -oConnectTimeout=5 -- \
-		    "${host}"-tor nc -cw5 ifcfg.me 443 |
+		command ssh -oConnectTimeout=5 \
+		    -- "${host}"-tor nc ${1} -cw5 ifcfg.me 443 |
 		tail -n1
 }
 
-_mosh() {
+mosh() {
 	set -x
-	mosh ${1} \
-	     --ssh="ssh -oConnectTimeout=5 ${NO_CHECK:+${ssh_opts}}" \
-	     -- "${2:-${host}}" ${remote_cmd}
+	command mosh --family=prefer-inet6 ${1:-} \
+		--ssh="ssh -oConnectTimeout=5 ${NO_CHECK:+${ssh_opts}}" \
+		-- "${2:-${host}}" ${remote_cmd}
 }
 
-_ssh() {
-	set -x
-	ssh -t -oConnectTimeout=5 ${NO_CHECK:+${ssh_opts}} ${1} \
-	    -- "${2:-${host}}" ${remote_cmd}
+ssh() {
+	s	x
+	command ssh -t -oConnectTimeout=5 ${NO_CHECK:+${ssh_opts}} ${1} \
+		-- "${2:-${host}}" ${remote_cmd}
 }
 
-printf 'LAN: ...' 1>&2
-{
-	ping6 -c2 -qnw1 "${host}" ||
-	ping  -c2 -qnw1 "${host}"
-} 2>/dev/null 1>&2
+printf 'LAN...\n'
 
-[ ${?} -eq 0 ] &&
-	_mosh ||
-	printf failed\\n 1>&2
+if [ ${?} -eq 0 ]; then
+	mosh ||
+	ssh ||
+	printf 'LAN failed\n'
+fi
 
-printf 'WAN: IP: ...' 1>&2
-ip="$(_ip)"
-printf '\b\b\b%s\n' "${ip:?Could not get public IP}"
-
+printf 'WAN...\n'
 NO_CHECK=1
 
-_mosh "-p ${mosh_ports}" "${USER}"@"${ip}" ||
-	printf failed\\n 1>&2
+for f in 6 4; do
+	ip="$(ip -${f})"
+	printf '  IPv%d: %s\n' ${f} "${ip:-failed}"
+	mosh "-p ${mosh_ports}" "${ip}" ||
+	ssh "${USER}"@"{ip}" ||
+		printf '  IPv%d failed\n' ${f}
+done
 
-_ssh ||
-	printf failed\\n 1>&2
-
-_ssh '-q -oStrictHostKeyChecking=no' "${host}"-tor ||
-	printf failed\\n 1>&2
+exec command ssh "${host}"-tor ||
+	printf 'Tor failed\n'
