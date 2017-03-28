@@ -4,13 +4,18 @@
 # Wrapper to connect to remote hosts defined in ssh_config(5)
 # transparently through ssh(1) or mosh(1) depending on network
 # connectivity. IPv6 is always preferred over IPv4, Tor hidden services
-# can be used as last resort.
+# can be used as last resort. The same hidden service is currently used
+# to obtain the remote host's public IPv4/6 addresses in an address
+# family agnostic way.
 #
 # Example ssh_config(5) for host foo over Tor:
 #
 #	Host foo-tor
 #		Hostname	0xdeadbeef123456.onion
 #		ProxyCommand	nc -6nX5 -x[::1]:9050 %h %p
+
+set -eu
+PS4='    '
 
 err() {
 	cat <<- EOF 1>&2
@@ -37,11 +42,12 @@ case "${1}" in
 	;;
 esac
 remote_cmd="${@:-}"
-ssh_opts='-oStrictHostKeyChecking=no -oUserKnownHostsFile=/dev/null'
+def_opts='-q -oConnectTimeout=5'
+ck_opts='-oStrictHostKeyChecking=no -oUserKnownHostsFile=/dev/null'
 
 ip() {
 	printf 'GET /ip HTTP/1.0\r\n\r\n' |
-		command ssh -oConnectTimeout=5 \
+		command ssh -T ${def_opts} \
 		    -- "${host}"-tor nc ${1} -cw5 ifcfg.me 443 |
 		tail -n1
 }
@@ -49,13 +55,13 @@ ip() {
 mosh() {
 	set -x
 	command mosh --family=prefer-inet6 ${mosh_ports:-} \
-		--ssh="ssh -oConnectTimeout=5 ${NO_CHECK:+${ssh_opts}}" \
-		-- "${1:-${host}}" ${remote_cmd:-}
+		--ssh="ssh -T ${def_opts} ${NO_CHECK:+${ck_opts}}" \
+		-- "${1:-${host}}" ${remote_cmd:-} 2>/dev/null
 }
 
 ssh() {
 	set -x
-	command ssh -t -oConnectTimeout=5 ${NO_CHECK:+${ssh_opts}} \
+	command ssh -t ${def_opts} ${NO_CHECK:+${ck_opts}} \
 		-- "${1:-${host}}" ${remote_cmd:-}
 }
 
@@ -71,12 +77,19 @@ printf 'WAN...\n'
 NO_CHECK=1
 
 for f in 6 4; do
+	printf '  IPv%d: ...' ${f}
 	ip="$(ip -${f})"
-	printf '  IPv%d: %s\n' ${f} "${ip:-failed}"
+	if [ -z "${ip}" ]; then
+		printf '\b\b\bnot found\n'
+		continue
+	fi
+	printf '\b\b\b%s\n' "${ip}"
 	mosh "${ip}" ||
-	ssh "${ip}" ||
-		printf '  IPv%d failed\n' ${f}
+	ssh  "${ip}" ||
+		printf 'IPv%d failed\n' ${f}
 done
 
-exec command ssh -t "${host}"-tor ||
-	printf 'Tor failed\n'
+printf 'Tor...\n'
+
+ssh "${host}"-tor ||
+	printf '\b\b\b failed\n'
