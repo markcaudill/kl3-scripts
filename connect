@@ -1,6 +1,4 @@
 #!/bin/sh
-# Connect to remote host through ssh(1) or mosh(1) depending on the
-# current network connectivity execute given command.
 # Wrapper to connect to remote hosts defined in ssh_config(5)
 # transparently through ssh(1) or mosh(1) depending on network
 # connectivity. IPv6 is always preferred over IPv4, Tor hidden services
@@ -67,11 +65,9 @@ ssh() {
 
 printf 'LAN...\n'
 
-if [ ${?} -eq 0 ]; then
-	mosh ||
-	ssh ||
+mosh ||
+ssh  ||
 	printf 'LAN failed\n'
-fi
 
 printf 'WAN...\n'
 NO_CHECK=1
