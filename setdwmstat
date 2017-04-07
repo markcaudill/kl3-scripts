@@ -1,18 +1,20 @@
 #!/bin/sh
+# DEPRECATED: See https://notabug.org/kl3/dwmstat
+#
 # set dwm(1)'s status bar
 # $CMUS_STATUS_FILE is declared in ~/.profile
 
 while :
 do
 	xsetroot -name "$(printf '%s │  %s  %d°C  %d%%  %s' \
-		"$(grep -FxA1 playing "${CMUS_STATUS_FILE}" \
-			| tail -n1 \
-			| cut -c1-40)" \
-		"$(getip \
-			| tail -n1)" \
+		"$(grep -FxA1 playing "${CMUS_STATUS_FILE}" |
+			tail -n1 |
+			cut -c1-40)" \
+		"$(getip |
+			tail -n1)" \
 		$(gettemp) \
-		$(getvol \
-			| cut -d. -f1) \
+		$(getvol |
+			cut -d. -f1) \
 		"$(date '+%a %d.%m.%y %H:%M')")"
 	sleep 30
 done
