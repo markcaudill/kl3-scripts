@@ -32,9 +32,5 @@ term=
 [ ! -t 0 ] && [ -n "${DISPLAY}" ] &&
 	term='st -e'
 
-if tmux has-session -t "${name}"; then
-	exec ${term:-} tmux attach-session -t "${name}"
-else
-	exec ${term:-} tmux new-session -n "${name}" -s "${name}" \
-		"${bin}" "${@}"
-fi
+exec ${term:-} tmux new-session -A -n "${name}" -s "${name}" \
+	"${bin}" "${@}"
