@@ -1,27 +1,40 @@
 #!/bin/sh
-# Attach to existing tmux session or run $PROGRAM inside newly spawned one
-# USAGE:	$ ln -s ${HOME}/tmuxify ${HOME}/mutt && mutt
+# Ensure that the program being symlinked from is always run
+# inside a tmux(1) session. If already running, simply attach.
+# Command line arguments are passed unmodified to the program upon
+# spawning a new session.
+#
+# In case standard input is not a terminal, this script will try
+# spawning a new one.
+#
+# USAGE:
+#	$ ln -s $(which tmuxify) mutt
+#	$ ./mutt -R	# run 'mutt -R' or attach to "mutt"
 
-# The program's name
+set -eu
+
+# name of the program/symlink
 name="${0##*/}"
-# This script's absoloute path
-path="$(readlink "${0}")"
-# Next binary in $PATH
-exe="$(which -a "${name}" \
-		| grep -vE "^(${path%/*}|$(cd "${0%/*}" && pwd))" \
-		| head -n1)"
+# absoloute path to this script
+self="$(readlink -fn "${0}")"
+# first program in $PATH called $name
+bin=
+for p in $(which -a "${name}"); do
+	# prevent recursion
+	if [ "$(readlink -fn "${p}")" != "${self}" ]; then
+		bin="${p}"
+		break
+	fi
+done
 
-[ -z "${exe}" ] \
-	&& printf '"%s" not found in $PATH.' "${name}" 1>&2 \
-	&& exit 1
-
-# Open terminal if neccessary
-[ ! -t 0 ] && [ -n "${DISPLAY}" ] \
-	&& term='st -e'
+# XXX: Detect terminal emulator reliably or drop this feature
+term=
+[ ! -t 0 ] && [ -n "${DISPLAY}" ] &&
+	term='st -e'
 
 if tmux has-session -t "${name}"; then
 	exec ${term:-} tmux attach-session -t "${name}"
 else
 	exec ${term:-} tmux new-session -n "${name}" -s "${name}" \
-		"${exe}" ${@}
+		"${bin}" "${@}"
 fi
