@@ -1,21 +1,17 @@
-scripts
-=======
+#scripts
 
-Most of them show various system information such as system volume, IP address,
-CPU fan speed and more, ready to be used with other tools like [dwm](https://notabug.org/kl3/dwm) to set its
-status bar for example.
+This collection contains various helpers for obtaining system information such
+as volume, IP address(es) as well as more advanced wrappers around frequently
+used tools such as **tmux(1)** and **ssh(1)**. Where needed a small description
+(incl. usage) can be found as comments in the scripts.
 
-All scripts are fully POSIX sh compliant.
+All scripts are written with portability in mind, that is only POSIX sh
+compliant code is used. Where possible, system/environment agnostic tools or
+ways are implemented to ensure that those scripts run on as many systems as
+possible without any modification.
 
-You can redistribute it and/or modify these scripts under the terms of
-the GNU General Public License as published by the Free Software
-Foundation, either version 3 of the License, or (at your option) any
-later version.
+If you find bugs, logical flaws or simpler ways to accomplish certain tasks,
+please let me know; I'll happily accept fixes or merge requests.
 
-These scripts are distributed in the hope that it will be useful, but
-WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program. If not, see <http://www.gnu.org/licenses/>.
+## License
+All code is released unter CC0, see [LICENSE](LICENSE) for details.
