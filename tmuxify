@@ -28,7 +28,7 @@ for p in $(which -a "${name}"); do
 done
 
 # Allow multiple instances of $bin
-[ -n "${TMUX}" ] &&
+[ -n "${TMUX:-}" ] &&
 	exec "${bin}" "${@}"
 
 # XXX: Detect terminal emulator reliably or drop this feature
