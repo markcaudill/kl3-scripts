@@ -27,6 +27,10 @@ for p in $(which -a "${name}"); do
 	fi
 done
 
+# Allow multiple instances of $bin
+[ -n "${TMUX}" ] &&
+	exec "${bin}" "${@}"
+
 # XXX: Detect terminal emulator reliably or drop this feature
 term=
 [ ! -t 0 ] && [ -n "${DISPLAY}" ] &&
