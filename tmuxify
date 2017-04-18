@@ -27,8 +27,8 @@ for p in $(which -a "${name}"); do
 	fi
 done
 
-# Allow multiple instances of $bin
-[ -n "${TMUX:-}" ] &&
+# Run new instance if in tmux or standard out is not a terminal
+[ ! -t 1 ] || [ -n "${TMUX:-}" ] &&
 	exec "${bin}" "${@}"
 
 # XXX: Detect terminal emulator reliably or drop this feature
