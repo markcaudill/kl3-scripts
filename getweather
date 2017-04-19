@@ -3,6 +3,6 @@
 
 # Ignore last two lines, stay in pager only if terminal height does
 # not suffice
-curl -sS http://wttr.in/"${1}" \
-	| head -n38 \
-	| less -cFKRSX
+curl -sS http://wttr.in/"${1}" |
+	head -n38 |
+	less -cFKRSX

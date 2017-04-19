@@ -33,9 +33,9 @@ api_url='https://stat.ripe.net/data/announced-prefixes/data.json?min_peers_seein
 # TODO: Check network connectivity to ensure table won't be emptied
 
 # Brace expansion done by curl(1) not sh(1)
-curl -sS --compressed "${api_url}{$(printf %s "${as}" \
-					| tr -dc '[:digit:]\n' \
-					| paste -sd, -)}" \
-	| grep -Fw prefix \
-	| cut -d\" -f4 \
-	| doas /sbin/pfctl -Treplace -tnetblock -f-
+curl -sS --compressed "${api_url}{$(printf %s "${as}" |
+					tr -dc '[:digit:]\n' |
+					paste -sd, -)}" |
+	grep -Fw prefix |
+	cut -d\" -f4 |
+	doas /sbin/pfctl -Treplace -tnetblock -f-
