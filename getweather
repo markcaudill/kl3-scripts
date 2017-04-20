@@ -1,8 +1,13 @@
 #!/bin/sh
-# Get detailed weather forecast [for given city]
+# Get detailed weather forecast for given city/location
 
-# Ignore last two lines, stay in pager only if terminal height does
+# stay in pager only if terminal height does
 # not suffice
-curl -sS http://wttr.in/"${1}" |
-	head -n38 |
+nc -cTnoverify wttr.in 443 << EOF |
+GET /${1:?} HTTP/1.0
+Host: wttr.in
+User-Agent: curl
+
+EOF
+	grep -Fe│ -e─ |
 	less -cFKRSX
