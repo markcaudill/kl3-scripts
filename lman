@@ -2,13 +2,16 @@
 # Read Linux manual pages from Debian
 # See man(1) and mandoc(1) for options
 
-args=$(getopt cl::s::O::T:: "${@}")
-[ ${?} -ne 0 ] &&
+usage() {
 	cat << EOF &&
 usage: ${0##*/} [-c] [-l language] [-s section] [-O options]
-         [-O options] [-T output] name
+            [-O options] [-T output] name
 EOF
-	exit 2
+	exit ${1}
+}
+
+args=$(getopt cl::s::O::T:: "${@}")
+[ ${?} -eq 0 ] || usage 2
 
 set -- ${args}
 
@@ -43,7 +46,9 @@ while [ ${#} -ne 0 ]; do
 	esac
 done
 
-name=/"${@:?}"
+[ -z "${@}" ] && usage 5
+
+name=/"${@}"
 url="${host}${suite}${pkg}${name}${section}${lang}${fmt}"
 
 curl -fLsS "${url}" |
