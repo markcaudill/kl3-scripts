@@ -3,17 +3,15 @@
 
 set -eu
 
-[ $(id -u) -eq 0 ]
-
 ask() {
-	printf '%s? [yN]: ' "${1}"
+	printf '%s? [yN]: ' "${1}" 1>&2
 	read REPLY
 	[ "${REPLY}" = y ]
 }
 
 build() {
 	set -x
-	mount -s /usr/${X:-}obj
+	doas mount -s /usr/${X:-}obj
 	time make -C"${DIR}" ${@:-} 1>/dev/null
 }
 
@@ -33,7 +31,7 @@ build_kernel() {
 	DIR=/sys/arch/"$(machine)"/compile/GENERIC.MP
 	build obj config
 	build
-	ask 'install kernel' && make -C"${DIR}" install
+	ask 'install kernel' && doas make -C"${DIR}" install
 }
 
 build_xenocara() {
