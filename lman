@@ -51,5 +51,7 @@ done
 name=/"${@}"
 url="${host}${suite}${pkg}${name}${section}${lang}${fmt}"
 
-curl -fLsS "${url}" |
+man=$(curl -fLsS "${url}") || exit 1
+
+printf %s "${man}" |
 	mandoc ${cflag} ${Oflag} ${Tflag}
