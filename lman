@@ -7,6 +7,11 @@ die() {
 	exit ${1}
 }
 
+MKDIR() {
+	[ -d "${1}" ] || mkdir -p "${1}" ||
+		die 1 "${1} cannot be created."
+}
+
 usage() {
 	cat << EOF 1>&2
 usage: ${0##*/} [-c] [-l language] [-s section] [-O options]
@@ -14,6 +19,7 @@ usage: ${0##*/} [-c] [-l language] [-s section] [-O options]
 EOF
 	exit ${1}
 }
+
 
 args=$(getopt cl::s::O::T:: "${@}")
 [ ${?} -eq 0 ] || usage 2
@@ -52,9 +58,21 @@ while [ ${#} -ne 0 ]; do
 done
 
 [ -z "${@}" ] && usage 5
-
 # foo
 name=/"${@}"
+
+set -x
+
+lmanpath="${LMANPATH:-${HOME}/.lman}"
+MKDIR "${lmanpath}"
+
+MANDOC="mandoc ${cflag} ${Oflag} ${Tflag}"
+
+# cache hit?
+file=$(find "${lmanpath}" -type f -name "${name#/}.*" |
+	grep -E "${name#/}\.[1-9]$" | head -n1)
+[ -n "${file}" ] && exec ${MANDOC} "${file}"
+
 scheme="${host}${suite}${pkg}${name}${section}${lang}${fmt}"
 
 # https://.../foo.1.en.gz
@@ -66,15 +84,14 @@ man=${man%.*}
 # foo.1
 man=${man%.*}
 
-lmanpath="${LMANPATH:-${HOME}/.lman}"/man${man##*.}
-[ -d "${lmanpath}" ] || mkdir -p "${lmanpath}" ||
-	die 1 "${lmanpath} cannot be created."
+lmanpath="${lmanpath}"/man${man##*.}
+MKDIR "${lmanpath}"
 
-# lman/man1/foo.1
+# ~/.lman/man1/foo.1
 file="${lmanpath}"/${man}
 
-# cache man page, fetch/refresh if possible otherwise read from file
+# fetch/refresh if possible otherwise read from file
 curl -fsSRz"${file}" -o"${file}" "${url}" || [ -e "${file}" ] ||
 	die 1 "No entry for ${file##*/} in the manual."
 
-mandoc ${cflag} ${Oflag} ${Tflag} "${file}"
+${MANDOC} "${file}"
