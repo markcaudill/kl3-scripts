@@ -2,8 +2,13 @@
 # Read Linux manual pages from Debian
 # See man(1) and mandoc(1) for options
 
+die() {
+	printf %s\\n "${2}" 1>&2
+	exit ${1}
+}
+
 usage() {
-	cat << EOF &&
+	cat << EOF 1>&2
 usage: ${0##*/} [-c] [-l language] [-s section] [-O options]
             [-O options] [-T output] name
 EOF
@@ -49,9 +54,17 @@ done
 [ -z "${@}" ] && usage 5
 
 name=/"${@}"
-url="${host}${suite}${pkg}${name}${section}${lang}${fmt}"
+scheme="${host}${suite}${pkg}${name}${section}${lang}${fmt}"
 
-man=$(curl -fLsS "${url}") || exit 1
+path=~/.cache/lman
+[ -d "${path}" ] || mkdir -p "${path}" ||
+	die 1 "${path} not writable."
 
-printf %s "${man}" |
-	mandoc ${cflag} ${Oflag} ${Tflag}
+# XXX: fetch resulting url (section/name) seperately
+man="${path}"/$(printf %s "${scheme}" | sha1 -q)
+
+# cache man page, fetch/refresh if possible otherwise read from file
+curl -fLsSRz "${man}" -o "${man}" "${scheme}" || [ -e "${man}" ] ||
+	die 1 "${0##*/}: No entry for ${man##*/} in the manual."
+
+mandoc ${cflag} ${Oflag} ${Tflag} "${man}"
