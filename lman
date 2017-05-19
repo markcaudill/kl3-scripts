@@ -1,6 +1,7 @@
 #!/bin/sh
 # Download Linux manual pages from manpages.debian.org and cache them
-# for transparent offline usage
+# for transparent offline usage.
+# LMANPATH can be appended to MANPATH to provide "native" fallback.
 # See man(1) and mandoc(1) for options
 
 die() {
@@ -81,15 +82,14 @@ MKDIR "${lmanpath}"
 name=/"${@}"
 scheme="${host}${suite}${pkg}${name}${section}${lang}${fmt}"
 
+
 # cache lookup
-# XXX: match sections more precisely
-file=$(find "${lmanpath}" -type f -name "${name#/}.*" |
-	grep -E "${name#/}\.[1-9]$" | head -n1)
+file=$(find "${lmanpath}" -type f -name "${name#/}${section:-.*}" |
+	grep -E "${name#/}\.[1-9]p?m?$" | head -n1)
 # cache hit
 if [ -n "${file}" ]; then
 	# update
-	# XXX: simplify
-	url=$(geturl "${scheme%gz}${file##*.}${lang}${fmt}")
+	url=$(geturl "${scheme%/*}/${file##*/}${lang}${fmt}")
 	[ -n "${url}" ] && cache "${file}" "${url}"
 	exec ${MANDOC} "${file}"
 fi
