@@ -4,8 +4,7 @@
 
 cache() {
 	# fetch new/update cached new manual page
-	curl --connect-timeout 3 -fsSRz"${1}" -o"${1}" "${2}" ||
-		die 1 "Could not fetch/update ${1##*/}."
+	curl --connect-timeout 3 -fsSRz"${1}" -o"${1}" "${2}"
 }
 
 die() {
@@ -66,7 +65,7 @@ done
 [ -z "${@}" ] && usage 5
 # foo
 name=/"${@}"
-set -x
+
 lmanpath="${LMANPATH:-${HOME}/.lman}"
 MKDIR "${lmanpath}"
 
@@ -101,5 +100,5 @@ MKDIR "${lmanpath}"
 file="${lmanpath}"/${man}
 
 # fetch
-cache "${file}" "${url}" &&
-	exec ${MANDOC} "${file}"
+cache "${file}" "${url}" || die 1 "Could not fetch ${file}."
+exec ${MANDOC} "${file}"
