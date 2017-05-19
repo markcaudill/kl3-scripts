@@ -1,20 +1,11 @@
 #!/bin/sh
-# Read Linux manual pages from Debian
+# Download Linux manual pages from manpages.debian.org and cache them
+# for transparent offline usage
 # See man(1) and mandoc(1) for options
-
-cache() {
-	# fetch new/update cached new manual page
-	curl --connect-timeout 3 -fsSRz"${1}" -o"${1}" "${2}"
-}
 
 die() {
 	printf '%s: %s\n' "${0##*/}" "${2}" 1>&2
 	exit ${1}
-}
-
-MKDIR() {
-	[ -d "${1}" ] || mkdir -p "${1}" ||
-		die 1 "${1} cannot be created."
 }
 
 usage() {
@@ -23,6 +14,23 @@ usage: ${0##*/} [-c] [-l language] [-s section] [-O options]
             [-O options] [-T output] name
 EOF
 	exit ${1}
+}
+
+
+cache() {
+	# fetch new/update cached new manual page
+	curl --connect-timeout 3 -fsRz"${1}" -o"${1}" "${2}"
+}
+
+geturl() {
+	curl -fsLI "${1}" | grep ^Location | grep -Fv dyn.manpages |
+		cut -d' ' -f2 | tr -d \\r
+}
+
+
+MKDIR() {
+	[ -d "${1}" ] || mkdir -p "${1}" ||
+		die 1 "${1} cannot be created."
 }
 
 
@@ -63,30 +71,33 @@ while [ ${#} -ne 0 ]; do
 done
 
 [ -z "${@}" ] && usage 5
-# foo
-name=/"${@}"
+MANDOC="mandoc ${cflag} ${Oflag} ${Tflag}"
+
 
 lmanpath="${LMANPATH:-${HOME}/.lman}"
 MKDIR "${lmanpath}"
 
-MANDOC="mandoc ${cflag} ${Oflag} ${Tflag}"
-
+# foo
+name=/"${@}"
 scheme="${host}${suite}${pkg}${name}${section}${lang}${fmt}"
 
+# cache lookup
+# XXX: match sections more precisely
 file=$(find "${lmanpath}" -type f -name "${name#/}.*" |
 	grep -E "${name#/}\.[1-9]$" | head -n1)
 # cache hit
 if [ -n "${file}" ]; then
-	# XXX: update before reading
+	# update
+	# XXX: simplify
+	url=$(geturl "${scheme%gz}${file##*.}${lang}${fmt}")
+	[ -n "${url}" ] && cache "${file}" "${url}"
 	exec ${MANDOC} "${file}"
 fi
 
+# cache miss
 # https://.../foo.1.en.gz
-url=$(curl -fsSLI "${scheme}" | grep ^Location | grep -Fv dyn.manpages |
-	cut -d' ' -f2 | tr -d \\r)
+url=$(geturl "${scheme}")
 [ -z "${url}" ] && die 1 "No entry for ${name#/} in the manual."
-
-# successful lookup
 
 man=${url##*/}
 man=${man%.*}
