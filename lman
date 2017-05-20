@@ -19,13 +19,13 @@ EOF
 
 
 cache() {
-	# fetch new/update cached new manual page
-	curl --connect-timeout 3 -fsRz"${1}" -o"${1}" "${2}"
+	# fetch new/update cached manual page
+	curl --connect-timeout 3 --compressed -fsRz"${2}" -o"${2}" "${1}"
 }
 
 geturl() {
-	curl -fsLI "${1}" | grep ^Location | grep -Fv dyn.manpages |
-		cut -d' ' -f2 | tr -d \\r
+	curl -fsLI "${1}" | sed -n s/^Location:\ //p | tr -d \\r |
+		grep -Fv https://dyn.
 }
 
 
@@ -76,7 +76,7 @@ file=$(find "${lmanpath}" -type f -name "${name#/}${section:-.*}" |
 [ -n "${file}" ] && {
 	# update
 	url=$(geturl "${scheme%/*}/${file##*/}${lang}${fmt}")
-	[ -n "${url}" ] && cache "${file}" "${url}"
+	[ -n "${url}" ] && cache "${url}" "${file}"
 	exec ${MANDOC} "${file}"
 }
 
@@ -92,9 +92,9 @@ man=${url##*/} man=${man%.*} man=${man%.*}
 lmanpath="${lmanpath}"/man${man##*.}
 MKDIR "${lmanpath}"
 
-# ~/.lman/man1/foo.1
+# .../man1/foo.1
 file="${lmanpath}"/${man}
 
 # fetch
-cache "${file}" "${url}" || die 1 "Could not fetch ${file}."
+cache "${url}" "${file}" || die 1 "Could not fetch ${file}."
 exec ${MANDOC} "${file}"
