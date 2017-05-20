@@ -1,4 +1,4 @@
-#scripts
+# scripts
 
 This collection contains various helpers for obtaining system information such
 as volume, IP address(es) as well as more advanced wrappers around frequently
