@@ -35,7 +35,7 @@ MKDIR() {
 }
 
 
-args=$(getopt cl::s::O::T:: "${@}") || usage 2
+args=$(getopt cO:T:r:p:s:l: "${@}") || usage 2
 set -- ${args}
 
 host=https://manpages.debian.org
