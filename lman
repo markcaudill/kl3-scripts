@@ -20,8 +20,8 @@ curlopts='--connect-timeout 3 -fs'
 
 cache() {
 	MKDIR "${2%/*}"
-	# fetch new/update cached manual page
 	curl ${curlopts} --compressed -Rz"${2}" -o"${2}" "${1}"
+	makewhatis
 }
 
 geturl() {
