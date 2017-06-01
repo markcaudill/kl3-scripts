@@ -51,25 +51,32 @@ while [ ${#} -ne 0 ]; do
 	case "${1}" in
 	-[acfhklw])
 		shift;;
-	-[Ss])
-		eval ${1#-}arg=.${2};
-		shift 2;;
 	-[CMm])
-		printf "'-%s %s' option ignored\n" ${1} "${2}" 1>&2
+		shift 2;;
+	-[Ss])
+		eval ${1#-}arg=.${2}
 		shift 2;;
 	--)
 		shift
 		break;;
 	esac
 done
-[ -z "${@}" ] && usage 5
 
+# turn '... 1 foo' into '... -s 1 foo'
+case "${1}" in
+[1-9nl]|3am|3posix|perl)
+	[ -n "${sarg}" ] && usage 5
+	sarg=.${1}
+	shift;;
+esac
+
+[ ${#} -eq 1 ] || usage 5
 
 # API parameters
 host=https://manpages.debian.org
 suite=/unstable
 ## foo
-name=/"${*}"
+name=/"${1}"
 section=${sarg}${Sarg}
 fmt=.gz
 scheme="${host}${suite}${pkg}${name}${section}${lang}${fmt}"
