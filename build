@@ -9,15 +9,18 @@ ask() {
 	[ "${REPLY}" = y ]
 }
 
-build() {
+_build() {
+	exec 1>/dev/null
 	set -x
-	doas mount -s /usr/${X:-}obj
-	time make -C"${DIR}" ${@:-} 1>/dev/null
+	doas mount -s /usr/${X}obj
+	time ${DOAS} make -C"${DIR}" -s ${@}
 }
 
 build_base() {
 	DIR=/usr/src
-	build obj build
+	_build obj
+	DOAS=doas
+	_build -j4 build
 	if ask 'run sysmerge'; then
 		if ask '  diff mode'; then
 			sysmerge -d
@@ -25,22 +28,33 @@ build_base() {
 			sysmerge
 		fi
 	fi
+	if ask 'create device nodes'; then
+		cd /dev && doas ./MAKEDEV all
+	fi
 }
 
 build_kernel() {
 	DIR=/sys/arch/"$(machine)"/compile/GENERIC.MP
-	build obj config
-	build
-	ask 'install kernel' && doas make -C"${DIR}" install
+	_build obj
+	_build config
+	_build -j4
+	if ask 'install kernel'; then
+		DOAS=doas
+		_build install
+	fi
 }
 
 build_xenocara() {
 	DIR=/usr/xenocara
-	X=x build bootstrap obj build
+	X=x
+	_build bootstrap
+	_build obj
+	DOAS=doas
+	_build -j4 build
 }
 
-ask 'build kernel'   && build_kernel
-ask 'build base'     && build_base
-ask 'build xenocara' && build_xenocara
+for p in kernel base xenocara; do
+	ask "build ${p}" && eval build_${p}
+done
 
 return 0
