@@ -1,9 +1,0 @@
-#!/bin/sh
-# Select a host defined in ssh_config(5) and optionally pass ssh(1)
-# options or a command to execute remotely by editing the selection in
-# dmenu(1)
-
-exec ssh $(grep ^Host "${HOME}"/.ssh/config |
-		cut -d' ' -f2 |
-		sort -df |
-		dmenu -p Host: -l 20)
