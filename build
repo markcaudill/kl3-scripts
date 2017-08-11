@@ -12,11 +12,12 @@ ask() {
 _build() {
 	exec 1>/dev/null
 	set -x
-	doas mount -s /usr/${X}obj
-	time ${DOAS} make -C"${DIR}" -s ${@}
+	doas mount -s /usr/${X:-}obj
+	time ${DOAS:-} make -C"${DIR}" -s ${@}
 }
 
 build_base() {
+	local DIR DOAS
 	DIR=/usr/src
 	_build obj
 	DOAS=doas
@@ -34,6 +35,7 @@ build_base() {
 }
 
 build_kernel() {
+	local DIR DOAS
 	DIR=/sys/arch/"$(machine)"/compile/GENERIC.MP
 	_build obj
 	_build config
