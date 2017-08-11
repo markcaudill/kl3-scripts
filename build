@@ -21,7 +21,7 @@ build_base() {
 	DIR=/usr/src
 	_build obj
 	DOAS=doas
-	_build -j4 build
+	_build build
 	if ask 'run sysmerge'; then
 		if ask '  diff mode'; then
 			sysmerge -d
@@ -39,7 +39,7 @@ build_kernel() {
 	DIR=/sys/arch/"$(machine)"/compile/GENERIC.MP
 	_build obj
 	_build config
-	_build -j4
+	_build
 	if ask 'install kernel'; then
 		DOAS=doas
 		_build install
@@ -52,7 +52,7 @@ build_xenocara() {
 	_build bootstrap
 	_build obj
 	DOAS=doas
-	_build -j4 build
+	_build build
 }
 
 for p in kernel base xenocara; do
