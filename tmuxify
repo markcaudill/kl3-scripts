@@ -4,9 +4,6 @@
 # Command line arguments are passed unmodified to the program upon
 # spawning a new session.
 #
-# In case standard input is not a terminal, this script will try
-# spawning a new one.
-#
 # USAGE:
 #	$ ln -s $(which tmuxify) mutt
 #	$ ./mutt -R	# run 'mutt -R' or attach to "mutt"
@@ -19,6 +16,7 @@ name="${0##*/}"
 self="$(readlink -fn "${0}")"
 # first program in $PATH called $name
 bin=
+
 for p in $(which -a "${name}"); do
 	# prevent recursion
 	if [ "$(readlink -fn "${p}")" != "${self}" ]; then
@@ -27,14 +25,9 @@ for p in $(which -a "${name}"); do
 	fi
 done
 
-# Run new instance if in tmux or standard out is not a terminal
-[ ! -t 1 ] || [ -n "${TMUX:-}" ] &&
+# Run new instance if in tmux
+[ -n "${TMUX:-}" ] &&
 	exec "${bin}" "${@}"
-
-# XXX: Detect terminal emulator reliably or drop this feature
-term=
-[ ! -t 0 ] && [ -n "${DISPLAY}" ] &&
-	term='st -e'
 
 exec ${term:-} tmux new-session -A -n "${name}" -s "${name}" \
 	"${bin}" "${@}"
