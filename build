@@ -14,17 +14,15 @@ ask() {
 }
 
 _build() {
-	exec 1>/dev/null
 	set -x
-	mount -s /usr/${X:-}obj
 	time make -C"${DIR}" -s ${@}
 }
 
 build_base() {
-	local DIR
-	DIR=/usr/src
+	local DIR=/usr/src
 	_build obj
 	mount -wu /usr
+	mount -s /usr/obj
 	_build build
 	if ask 'run sysmerge'; then
 		if ask '  diff mode'; then
@@ -40,8 +38,8 @@ build_base() {
 }
 
 build_kernel() {
-	local DIR
-	DIR=/sys/arch/"$(machine)"/compile/GENERIC.MP
+	local DIR=/sys/arch/"$(machine)"/compile/GENERIC.MP
+	mount -s /usr/obj
 	_build obj
 	_build config
 	_build
@@ -51,9 +49,9 @@ build_kernel() {
 }
 
 build_xenocara() {
-	DIR=/usr/xenocara
-	X=x
+	local DIR=/usr/xenocara
 	mount -wu /usr/X11R6
+	mount -wu /usr/xobj
 	_build bootstrap
 	_build obj
 	_build build
