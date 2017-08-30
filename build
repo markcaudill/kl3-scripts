@@ -3,6 +3,10 @@
 
 set -eu
 
+[ $(id -u) -ne 0 ] &&
+	printf '%s: you must be root\n' "${0##*/}" 2>&1 &&
+	exit 1
+
 ask() {
 	printf '%s? [yN]: ' "${1}" 1>&2
 	read REPLY
@@ -12,15 +16,15 @@ ask() {
 _build() {
 	exec 1>/dev/null
 	set -x
-	doas mount -s /usr/${X:-}obj
-	time ${DOAS:-} make -C"${DIR}" -s ${@}
+	mount -s /usr/${X:-}obj
+	time make -C"${DIR}" -s ${@}
 }
 
 build_base() {
-	local DIR DOAS
+	local DIR
 	DIR=/usr/src
 	_build obj
-	DOAS=doas
+	mount -wu /usr
 	_build build
 	if ask 'run sysmerge'; then
 		if ask '  diff mode'; then
@@ -30,18 +34,18 @@ build_base() {
 		fi
 	fi
 	if ask 'create device nodes'; then
-		cd /dev && doas ./MAKEDEV all
+		cd /dev && ./MAKEDEV all
 	fi
+	mount -ru /usr
 }
 
 build_kernel() {
-	local DIR DOAS
+	local DIR
 	DIR=/sys/arch/"$(machine)"/compile/GENERIC.MP
 	_build obj
 	_build config
 	_build
 	if ask 'install kernel'; then
-		DOAS=doas
 		_build install
 	fi
 }
@@ -49,10 +53,11 @@ build_kernel() {
 build_xenocara() {
 	DIR=/usr/xenocara
 	X=x
+	mount -wu /usr/X11R6
 	_build bootstrap
 	_build obj
-	DOAS=doas
 	_build build
+	mount -ru /usr/X11R6
 }
 
 for p in kernel base xenocara; do
