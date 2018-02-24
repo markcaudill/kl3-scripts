@@ -40,7 +40,7 @@ case "${1}" in
 	;;
 esac
 remote_cmd="${@:-}"
-def_opts='-q -oConnectTimeout=5'
+def_opts='-q -oConnectTimeout=10'
 ck_opts='-oStrictHostKeyChecking=no -oUserKnownHostsFile=/dev/null'
 
 ip() {
