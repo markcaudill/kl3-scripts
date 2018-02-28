@@ -1,5 +1,0 @@
-#!/bin/sh
-# Lock screen before suspend to RAM
-# Needs doas.conf(5) entry for user speicified in slock(1)'s config.h
-
-lock doas /usr/sbin/apm -z
