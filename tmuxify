@@ -29,5 +29,5 @@ done
 [ -n "${TMUX:-}" ] &&
 	exec "${bin}" "${@}"
 
-exec ${term:-} tmux new-session -A -n "${name}" -s "${name}" \
+exec tmux new-session -A -n "${name}" -s "${name}" \
 	"${bin}" "${@}"
