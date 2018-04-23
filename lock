@@ -1,8 +1,6 @@
 #!/bin/sh
-# lock X and suspend/resume programs before/after un/locking
+# turn screen off and lock X
 
 xset dpms force off
 
-pkill -SIGSTOP xbattmon dwmstat
-slock ${@}
-pkill -SIGCONT xbattmon dwmstat
+slock "$@"
