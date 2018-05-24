@@ -3,13 +3,13 @@
 # under $LMANPATH, same usage as man(1).
 
 die() {
-	printf '%s: %s\n' "${0##*/}" "${2}" 1>&2
-	exit ${1}
+	printf '%s: %s\n' "${0##*/}" "$*" 1>&2
+	exit 1
 }
 
 usage() {
 	MANPATH= man -h man | sed -e '/^-*$/d' 1>&2
-	exit ${1}
+	exit 5
 }
 
 MKDIR() {
@@ -39,7 +39,7 @@ ret=${?}
 exec 3>&-
 
 # quit if some page was read
-[ ${ret} -ne 5 ] && exit ${ret}
+[ $ret -eq 5 ] || exit $ret
 
 MKDIR "${MANPATH}"
 
@@ -48,7 +48,7 @@ while getopts acfhklwC:M:m:S:s: OPT; do
 	case ${OPT} in
 	[acfhklwCMm])	;;
 	[Ss])		eval ${OPT}arg=.${OPTARG};;
-	*)		usage 5;;
+	*)		usage;;
 	esac
 done
 args="${@}"
@@ -57,11 +57,11 @@ shift $((OPTIND - 1))
 # turn '... 1 foo' into '... -s 1 foo'
 case "${1}" in
 [1-9nl]|3am|3posix|3perl)
-	[ -n "${sarg}" ] && usage 5
+	[ -n "$sarg" ] && usage
 	sarg=.${1}
 	shift;;
 esac
-[ ${#} -eq 1 ] || usage 5
+[ $# -eq 1 ] || usage
 
 # API parameters
 host=https://manpages.debian.org
@@ -75,7 +75,7 @@ scheme="${host}${suite}${pkg}${name}${section}${lang}${fmt}"
 
 ## https://.../foo.1.en.gz
 url=$(geturl "${scheme}")
-[ -z "${url}" ] && die 1 "'${name#/}${section}' could not be found."
+[ -z "$url" ] && die "'${name#/}${section}' could not be found."
 
 ## foo.1
 man=${url##*/} man=${man%.*} man=${man%.*}
@@ -84,6 +84,6 @@ man=${url##*/} man=${man%.*} man=${man%.*}
 file="${MANPATH}"/man${man#*.}/${man}
 
 ## fetch missing page
-cache "${url}" "${file}" || die 1 "Could not fetch ${file}."
+cache "$url" "$file" || die "Could not fetch ${file}."
 
 exec man ${args}
