@@ -79,7 +79,7 @@ url=$(geturl "$scheme")
 man=${url##*/} man=${man%.*} man=${man%.*}
 
 ## .../man1/foo.1
-file="${MANPATH}"/man${man#*.}/${man}
+file="${MANPATH}"/man${man##*.}/${man}
 
 ## fetch missing page
 cache "$url" "$file" || die "Could not fetch ${file}."
